@@ -74,22 +74,22 @@ export const Window: React.FC<WindowProps> = ({
       const rect = windowRef.current.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
-      
+
       // Calculate distance from mouse to window center
       const distX = (e.clientX - centerX) / (window.innerWidth / 2);
       const distY = (e.clientY - centerY) / (window.innerHeight / 2);
-      
+
       // Calculate wobble effect (stronger when closer to the window)
       const distance = Math.sqrt(Math.pow(e.clientX - centerX, 2) + Math.pow(e.clientY - centerY, 2));
       const windowSize = Math.sqrt(Math.pow(rect.width, 2) + Math.pow(rect.height, 2));
       const maxDist = windowSize * 1.5;
       const factor = Math.max(0, 1 - distance / maxDist);
-      
+
       // Apply rotation and perspective transform
       const rotateY = distX * 2 * factor;
       const rotateX = -distY * 2 * factor;
       const transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-      
+
       setWobbleTransform(transform);
     };
 
@@ -111,18 +111,18 @@ export const Window: React.FC<WindowProps> = ({
     if (showDate) {
       const updateDate = () => {
         const now = new Date();
-        const options: Intl.DateTimeFormatOptions = { 
-          weekday: 'long', 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
+        const options: Intl.DateTimeFormatOptions = {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
         };
         setCurrentDate(now.toLocaleDateString('en-US', options));
       };
-      
+
       updateDate();
       const timer = setInterval(updateDate, 60000); // Update every minute
-      
+
       return () => clearInterval(timer);
     }
   }, [showDate]);
@@ -143,7 +143,7 @@ export const Window: React.FC<WindowProps> = ({
         y: e.clientY,
       };
     }
-    
+
     if (onFocus) onFocus();
   };
 
@@ -152,25 +152,25 @@ export const Window: React.FC<WindowProps> = ({
       // Calculate new position
       const deltaX = e.clientX - dragStartPosition.current.x;
       const deltaY = e.clientY - dragStartPosition.current.y;
-      
+
       const newX = dragStartPosition.current.windowX + deltaX;
       const newY = dragStartPosition.current.windowY + deltaY;
-      
+
       setPosition({ x: newX, y: newY });
     } else if (isResizing) {
       // Calculate new size
       const deltaX = e.clientX - resizeStartPosition.current.x;
       const deltaY = e.clientY - resizeStartPosition.current.y;
-      
+
       // Apply minimum size constraints
       const newWidth = Math.max(300, size.width + deltaX); // Increased minimum width
       const newHeight = Math.max(200, size.height + deltaY); // Increased minimum height
-      
+
       setSize({
         width: newWidth,
         height: newHeight,
       });
-      
+
       // Rather than constantly updating the position, update it once before setting a new move
       resizeStartPosition.current = {
         x: e.clientX,
@@ -182,12 +182,12 @@ export const Window: React.FC<WindowProps> = ({
   const handleMouseUp = () => {
     // If we were resizing, dispatch a custom event to notify terminals
     if (isResizing) {
-      const resizeEndEvent = new CustomEvent('terminal-resize-end', { 
+      const resizeEndEvent = new CustomEvent('terminal-resize-end', {
         bubbles: true,
         detail: { id }
       });
       windowRef.current?.dispatchEvent(resizeEndEvent);
-      
+
       // Add a small delay before setting isResizing to false
       // This gives terminals time to adjust
       setTimeout(() => {
@@ -196,7 +196,7 @@ export const Window: React.FC<WindowProps> = ({
     } else {
       setIsResizing(false);
     }
-    
+
     setIsDragging(false);
   };
 
@@ -208,7 +208,7 @@ export const Window: React.FC<WindowProps> = ({
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     }
-    
+
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
@@ -242,7 +242,7 @@ export const Window: React.FC<WindowProps> = ({
         duration: 300,
         easing: 'easeOutQuad'
       });
-      
+
       // Adjust position if window would overlap with topbar
       if (position.y < 48) { // 48px accounts for topbar height + some padding
         setPosition({
@@ -252,7 +252,7 @@ export const Window: React.FC<WindowProps> = ({
       }
     }
   }, []);
-  
+
   // Enhanced maximize/restore animation
   useEffect(() => {
     if (windowRef.current) {
@@ -281,17 +281,19 @@ export const Window: React.FC<WindowProps> = ({
         transform: wobbleEnabled ? wobbleTransform : "",
         transition: wobbleEnabled ? "transform 0.05s ease" : "none",
         borderRadius: "0.75rem",
-        backgroundColor: "rgba(35, 38, 52, 0.9)",
-        backdropFilter: "blur(8px)",
-        border: "1px solid rgba(81, 87, 109, 0.4)",
+        backgroundColor: "rgba(30, 30, 46, 0.65)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        border: "1px solid rgba(255, 255, 255, 0.1)",
+        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
       }}
       onMouseDown={() => onFocus && onFocus()}
     >
       {/* macOS style titlebar */}
       <div
-        className="window-header h-8 flex items-center justify-between px-3 cursor-move"
+        className="window-header h-8 flex items-center justify-between px-3 cursor-move border-b border-white/5"
         style={{
-          backgroundColor: "rgba(41, 44, 60, 0.9)",
+          backgroundColor: "rgba(17, 17, 27, 0.7)",
           borderTopLeftRadius: "0.75rem",
           borderTopRightRadius: "0.75rem",
         }}
@@ -301,7 +303,7 @@ export const Window: React.FC<WindowProps> = ({
         <div className="window-controls flex gap-1.5 items-center">
           {onClose && (
             <div
-              className="window-control close h-3 w-3 rounded-full bg-red hover:brightness-90 flex items-center justify-center group"
+              className="window-control close h-3 w-3 rounded-full bg-red hover:brightness-90 active:scale-90 transition-all flex items-center justify-center group"
               onClick={(e) => {
                 e.stopPropagation();
                 if (windowRef.current) {
@@ -322,10 +324,10 @@ export const Window: React.FC<WindowProps> = ({
               <span className="icon opacity-0 group-hover:opacity-100 text-black text-[8px]">×</span>
             </div>
           )}
-          
+
           {minimizable && (
             <div
-              className="window-control minimize h-3 w-3 rounded-full bg-yellow hover:brightness-90 flex items-center justify-center group"
+              className="window-control minimize h-3 w-3 rounded-full bg-yellow hover:brightness-90 active:scale-90 transition-all flex items-center justify-center group"
               onClick={(e) => {
                 e.stopPropagation();
                 // Handle minimize with animation
@@ -343,10 +345,10 @@ export const Window: React.FC<WindowProps> = ({
               <span className="icon opacity-0 group-hover:opacity-100 text-black text-[8px]">-</span>
             </div>
           )}
-          
+
           {maximizable && resizable && (
             <div
-              className="window-control maximize h-3 w-3 rounded-full bg-green hover:brightness-90 flex items-center justify-center group"
+              className="window-control maximize h-3 w-3 rounded-full bg-green hover:brightness-90 active:scale-90 transition-all flex items-center justify-center group"
               onClick={(e) => {
                 e.stopPropagation();
                 handleMaximize();
@@ -357,7 +359,7 @@ export const Window: React.FC<WindowProps> = ({
             </div>
           )}
         </div>
-        
+
         {/* Centered title with optional date */}
         <div className="window-title text-text text-sm font-medium absolute left-1/2 transform -translate-x-1/2 select-none flex flex-col items-center">
           <span>{title}</span>
@@ -365,12 +367,12 @@ export const Window: React.FC<WindowProps> = ({
             <span className="text-xs text-text/70">{currentDate}</span>
           )}
         </div>
-        
+
         {/* Spacer for right side */}
         <div className="w-14"></div>
       </div>
 
-      <div 
+      <div
         ref={contentRef}
         className="window-content"
         style={{
@@ -385,7 +387,7 @@ export const Window: React.FC<WindowProps> = ({
 
       {/* Resize handle for non-maximized windows */}
       {resizable && !maximized && (
-        <div 
+        <div
           className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize"
           onMouseDown={(e) => handleMouseDown(e, "resize")}
           style={{

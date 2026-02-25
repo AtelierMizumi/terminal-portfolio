@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Terminal as XTerminal } from 'xterm';
-import { FitAddon } from 'xterm-addon-fit';
-import { WebLinksAddon } from 'xterm-addon-web-links';
-import 'xterm/css/xterm.css';
+import { Terminal as XTerminal } from '@xterm/xterm';
+import { FitAddon } from '@xterm/addon-fit';
+import { WebLinksAddon } from '@xterm/addon-web-links';
+import '@xterm/xterm/css/xterm.css';
 import { commands } from '@/utils/commands';
 
 interface TerminalProps {
@@ -18,10 +18,10 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
   const [terminalReady, setTerminalReady] = useState(false);
   const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isResizingRef = useRef<boolean>(false);
-  
+
   useEffect(() => {
     if (!terminalRef.current) return;
-    
+
     // Initialize terminal with the container element
     const terminal = new XTerminal({
       fontFamily: '"JetBrains Mono", "Cascadia Code", monospace',
@@ -46,16 +46,16 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
       convertEol: true, // Important for proper line breaks
       disableStdin: false,
     });
-    
+
     // Add fit addon for resizing
     const fitAddon = new FitAddon();
     fitAddonRef.current = fitAddon;
     terminal.loadAddon(fitAddon);
     terminal.loadAddon(new WebLinksAddon());
-    
+
     // Open terminal in the provided element
     terminal.open(terminalRef.current);
-    
+
     // Store terminal instance for later use
     terminalInstanceRef.current = {
       terminal,
@@ -74,20 +74,20 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
       terminal.write('\x1b[1;32m$ Welcomes to my cozy place!\x1b[0m\r\n');
       terminal.write('\x1b[1;37mType "help" to see available commands.\x1b[0m\r\n\r\n');
       terminal.write('$ ');
-      
+
       // Set terminal ready state
       setTerminalReady(true);
-      
+
       // Initial fit to ensure proper sizing
       fitAddon.fit();
     }, 100);
-    
+
     // Handle window resize with debouncing
     const handleResize = () => {
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
       }
-      
+
       resizeTimeoutRef.current = setTimeout(() => {
         if (fitAddon && terminalRef.current?.offsetParent) {
           try {
@@ -101,38 +101,38 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
     };
 
     window.addEventListener('resize', handleResize);
-    
+
     // Set up command handling
     let currentLine = '';
     let commandHistory: string[] = [];
     let historyIndex = 0;
-    
+
     terminal.onKey(({ key, domEvent }) => {
       const charCode = domEvent.keyCode;
-      
+
       // Handle Enter key
       if (charCode === 13) {
         terminal.write('\r\n');
-        
+
         // Process command
         if (currentLine.trim()) {
           // Add to history
           commandHistory.push(currentLine);
           historyIndex = commandHistory.length;
-          
+
           // Process command
-          processCommand(currentLine, terminal);
+          processCommand(currentLine, terminal, commandHistory);
         } else {
           terminal.write('$ ');
         }
-        
+
         // Reset current line
-        
+
         currentLine = '';
-        
+
         // Ensure terminal scrolls to the bottom after command execution
         setTimeout(() => terminal.scrollToBottom(), 10);
-      } 
+      }
       // Handle Backspace
       else if (charCode === 8) {
         if (currentLine.length > 0) {
@@ -176,13 +176,69 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
           currentLine = '';
         }
       }
+      // Handle Tab - Autocompletion
+      else if (charCode === 9) {
+        if (currentLine.length > 0) {
+          const parts = currentLine.split(' ');
+          if (parts.length === 1) {
+            const cmdToComplete = parts[0].toLowerCase();
+            const availableCommands = Object.keys(commands).concat(['history']);
+            const matches = availableCommands.filter(c => c.startsWith(cmdToComplete));
+
+            if (matches.length === 1) {
+              // Found exact match
+              const match = matches[0];
+              const toAdd = match.substring(cmdToComplete.length);
+              currentLine += toAdd + ' ';
+              terminal.write(toAdd + ' ');
+            } else if (matches.length > 1) {
+              // Found multiple matches, show them
+              terminal.writeln('');
+              terminal.writeln('\x1b[1;36m' + matches.join('  ') + '\x1b[0m');
+              terminal.write('$ ' + currentLine);
+            }
+          } else if (parts[0].toLowerCase() === 'cat') {
+            // Rudimentary completion for cat command
+            const fileToComplete = parts[1].toLowerCase();
+            const files = ['about.txt', 'contact.txt', 'readme.md'];
+            const matches = files.filter(f => f.startsWith(fileToComplete));
+
+            if (matches.length === 1) {
+              const match = matches[0];
+              const toAdd = match.substring(fileToComplete.length);
+              currentLine += toAdd;
+              terminal.write(toAdd);
+            } else if (matches.length > 1) {
+              terminal.writeln('');
+              terminal.writeln('\x1b[1;32m' + matches.join('  ') + '\x1b[0m');
+              terminal.write('$ ' + currentLine);
+            }
+          } else if (parts[0].toLowerCase() === 'open') {
+            // Completion for open command
+            const appToComplete = parts[1].toLowerCase();
+            const apps = ['music', 'games', 'about', 'resume'];
+            const matches = apps.filter(a => a.startsWith(appToComplete));
+
+            if (matches.length === 1) {
+              const match = matches[0];
+              const toAdd = match.substring(appToComplete.length);
+              currentLine += toAdd;
+              terminal.write(toAdd);
+            } else if (matches.length > 1) {
+              terminal.writeln('');
+              terminal.writeln('\x1b[1;34m' + matches.join('  ') + '\x1b[0m');
+              terminal.write('$ ' + currentLine);
+            }
+          }
+        }
+      }
       // Handle normal character input
       else if (charCode >= 32) {
         currentLine += key;
         terminal.write(key);
       }
     });
-    
+
     // Clean up on unmount
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -194,14 +250,19 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
       }
     };
   }, []);
-  
+
   // Custom command handler implementation
-  const processCommand = async (command: string, terminal: XTerminal) => {
+  const processCommand = async (command: string, terminal: XTerminal, history: string[]) => {
     const parts = command.trim().split(' ');
     const cmd = parts[0].toLowerCase();
     const args = parts.slice(1);
-    
-    if (cmd in commands) {
+
+    if (cmd === 'history') {
+      terminal.writeln('');
+      history.forEach((h, i) => {
+        terminal.writeln(`  ${i + 1}  ${h}`);
+      });
+    } else if (cmd in commands) {
       await commands[cmd](terminal, args);
     } else if (cmd === '') {
       // Do nothing for empty command
@@ -209,7 +270,7 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
       terminal.writeln(`\r\nCommand not found: ${cmd}`);
       terminal.writeln('Type "help" to see available commands.');
     }
-    
+
     // Always show prompt after command execution
     terminal.write('\r\n$ ');
   };
@@ -218,11 +279,11 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
   useEffect(() => {
     const resizeObserver = new ResizeObserver(() => {
       if (isResizingRef.current) return; // Don't respond during active resize
-      
+
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
       }
-      
+
       resizeTimeoutRef.current = setTimeout(() => {
         if (fitAddonRef.current && terminalRef.current?.offsetParent) {
           try {
@@ -236,11 +297,11 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
         }
       }, 150); // Slightly longer delay to let resize settle
     });
-    
+
     if (terminalRef.current) {
       resizeObserver.observe(terminalRef.current);
     }
-    
+
     return () => {
       resizeObserver.disconnect();
       if (resizeTimeoutRef.current) {
@@ -248,16 +309,16 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
       }
     };
   }, [terminalReady]);
-  
+
   // Add listeners for window resize events
   useEffect(() => {
     const handleMouseDown = () => {
       isResizingRef.current = true;
     };
-    
+
     const handleMouseUp = () => {
       isResizingRef.current = false;
-      
+
       // After mouse up, fit the terminal once more
       setTimeout(() => {
         if (fitAddonRef.current && terminalRef.current?.offsetParent) {
@@ -272,16 +333,16 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
         }
       }, 200);
     };
-    
+
     // Get any resize handles from parent containers
     const resizeHandles = document.querySelectorAll('.absolute.bottom-0.right-0.w-4.h-4.cursor-se-resize');
-    
+
     resizeHandles.forEach(handle => {
       handle.addEventListener('mousedown', handleMouseDown);
     });
-    
+
     document.addEventListener('mouseup', handleMouseUp);
-    
+
     return () => {
       resizeHandles.forEach(handle => {
         handle.removeEventListener('mousedown', handleMouseDown);
@@ -289,19 +350,19 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
       document.removeEventListener('mouseup', handleMouseUp);
     };
   }, []);
-  
+
   // Listen for terminal-resize-end events from WindowManager
   useEffect(() => {
     const handleTerminalResizeEnd = (e: Event) => {
       const customEvent = e as CustomEvent;
-      
+
       // Set short timeout to let the window fully settle
       setTimeout(() => {
         if (fitAddonRef.current && terminalRef.current?.offsetParent) {
           try {
             // Force a complete terminal resize and refit
             fitAddonRef.current.fit();
-            
+
             // If we have a terminal instance, scroll to make sure content is visible
             if (terminalInstanceRef.current?.terminal) {
               terminalInstanceRef.current.terminal.scrollToBottom();
@@ -312,18 +373,18 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
         }
       }, 100);
     };
-    
+
     // Listen for the custom event from WindowManager
     document.addEventListener('terminal-resize-end', handleTerminalResizeEnd);
-    
+
     return () => {
       document.removeEventListener('terminal-resize-end', handleTerminalResizeEnd);
     };
   }, []);
-  
+
   return (
-    <div 
-      ref={terminalRef} 
+    <div
+      ref={terminalRef}
       className={`terminal-wrapper h-full w-full ${className}`}
       style={{ overflow: 'hidden', position: 'relative' }}
     />

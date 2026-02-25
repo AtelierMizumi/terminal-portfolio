@@ -16,11 +16,11 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: 'system',
+  theme: 'catppuccin',
   setTheme: () => null,
   changeTheme: () => null,
   cycleTheme: () => null,
-  accentColor: 'hsl(277, 59%, 76%)', // Mauve default
+  accentColor: 'hsl(277, 59%, 76%)',
   accentName: 'Mauve',
   changeAccentColor: () => null,
 });
@@ -31,52 +31,63 @@ interface ThemeProviderProps {
   children: ReactNode;
 }
 
+// Safe localStorage helper
+function safeGetItem(key: string): string | null {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage && typeof window.localStorage.getItem === 'function') {
+      return window.localStorage.getItem(key);
+    }
+  } catch { /* no-op */ }
+  return null;
+}
+
+function safeSetItem(key: string, value: string): void {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage && typeof window.localStorage.setItem === 'function') {
+      window.localStorage.setItem(key, value);
+    }
+  } catch { /* no-op */ }
+}
+
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [theme, setTheme] = useState<ThemeType>('system');
+  const [theme, setTheme] = useState<ThemeType>('catppuccin');
   const [mounted, setMounted] = useState(false);
-  const [accentColor, setAccentColor] = useState<string>('hsl(277, 59%, 76%)'); // Mauve default
+  const [accentColor, setAccentColor] = useState<string>('hsl(277, 59%, 76%)');
   const [accentName, setAccentName] = useState<string>('Mauve');
 
-  // Available themes
   const themes: ThemeType[] = ['catppuccin', 'bozo', 'mountains', 'sequoia'];
 
-  // Set mounted to true on client
   useEffect(() => {
     setMounted(true);
-    
-    // Try to get theme from localStorage
-    const savedTheme = localStorage.getItem('terminal-portfolio-theme');
+
+    const savedTheme = safeGetItem('terminal-portfolio-theme');
     if (savedTheme && themes.includes(savedTheme as ThemeType)) {
       setTheme(savedTheme as ThemeType);
     }
 
-    // Load saved accent color
-    const savedAccentColor = localStorage.getItem('terminal-portfolio-accent-color');
-    const savedAccentName = localStorage.getItem('terminal-portfolio-accent-name');
-    
+    const savedAccentColor = safeGetItem('terminal-portfolio-accent-color');
+    const savedAccentName = safeGetItem('terminal-portfolio-accent-name');
+
     if (savedAccentColor) {
       setAccentColor(savedAccentColor);
       document.documentElement.style.setProperty('--primary', savedAccentColor);
       document.documentElement.style.setProperty('--ring', savedAccentColor);
     }
-    
+
     if (savedAccentName) {
       setAccentName(savedAccentName);
     }
   }, []);
 
-  // Change theme function
   const changeTheme = (newTheme?: ThemeType) => {
     if (newTheme && themes.includes(newTheme)) {
       setTheme(newTheme);
-      localStorage.setItem('terminal-portfolio-theme', newTheme);
-      
-      // Dispatch an event that other components can listen to
+      safeSetItem('terminal-portfolio-theme', newTheme);
+
       document.dispatchEvent(
         new CustomEvent('change-background', { detail: newTheme })
       );
-      
-      // Animate theme button
+
       const themeButton = document.querySelector('.theme-button');
       if (themeButton) {
         animate(themeButton, {
@@ -87,26 +98,23 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       }
     }
   };
-  
-  // Cycle through themes
+
   const cycleTheme = () => {
     const currentIndex = themes.indexOf(theme);
     const nextIndex = (currentIndex + 1) % themes.length;
     changeTheme(themes[nextIndex]);
   };
 
-  // Change accent color function
   const changeAccentColor = (color: string, name: string) => {
     setAccentColor(color);
     setAccentName(name);
-    
+
     document.documentElement.style.setProperty('--primary', color);
     document.documentElement.style.setProperty('--ring', color);
-    
-    localStorage.setItem('terminal-portfolio-accent-color', color);
-    localStorage.setItem('terminal-portfolio-accent-name', name);
-    
-    // Animate color swatch if exists
+
+    safeSetItem('terminal-portfolio-accent-color', color);
+    safeSetItem('terminal-portfolio-accent-name', name);
+
     const colorSwatch = document.querySelector('.color-palette-button');
     if (colorSwatch) {
       animate(colorSwatch, {
@@ -116,12 +124,11 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       });
     }
   };
-  
-  // Return early if not mounted to avoid hydration issues
+
   if (!mounted) {
     return <>{children}</>;
   }
-  
+
   return (
     <ThemeContext.Provider value={{ theme, setTheme, changeTheme, cycleTheme, accentColor, accentName, changeAccentColor }}>
       {children}

@@ -10,6 +10,8 @@ interface ArchMenuProps {
   onTerminalOpen: () => void;
   onMusicOpen?: () => void;
   onGameMenuOpen: () => void;
+  onAboutOpen?: () => void;
+  onResumeOpen?: () => void;
 }
 
 export const ArchMenu: React.FC<ArchMenuProps> = ({
@@ -18,6 +20,8 @@ export const ArchMenu: React.FC<ArchMenuProps> = ({
   onTerminalOpen,
   onMusicOpen,
   onGameMenuOpen,
+  onAboutOpen,
+  onResumeOpen,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -63,7 +67,7 @@ export const ArchMenu: React.FC<ArchMenuProps> = ({
                   onTerminalOpen();
                   onClose();
                 }}
-                className="flex items-center p-2 rounded-md text-left hover:bg-[#313244] group"
+                className="flex items-center p-2 rounded-md text-left hover:bg-[#313244] active:scale-[0.98] transition-all group"
               >
                 <div className="w-8 h-8 bg-[#313244] group-hover:bg-[#45475a] rounded-full flex items-center justify-center mr-2">
                   <Terminal className="w-4 h-4 text-green-400" />
@@ -81,7 +85,7 @@ export const ArchMenu: React.FC<ArchMenuProps> = ({
                     onClose();
                   }
                 }}
-                className="flex items-center p-2 rounded-md text-left hover:bg-[#313244] group"
+                className="flex items-center p-2 rounded-md text-left hover:bg-[#313244] active:scale-[0.98] transition-all group"
               >
                 <div className="w-8 h-8 bg-[#313244] group-hover:bg-[#45475a] rounded-full flex items-center justify-center mr-2">
                   <Music className="w-4 h-4 text-purple-400" />
@@ -96,7 +100,7 @@ export const ArchMenu: React.FC<ArchMenuProps> = ({
                 onClick={() => {
                   onGameMenuOpen();
                 }}
-                className="flex items-center p-2 rounded-md text-left hover:bg-[#313244] group"
+                className="flex items-center p-2 rounded-md text-left hover:bg-[#313244] active:scale-[0.98] transition-all group"
               >
                 <div className="w-8 h-8 bg-[#313244] group-hover:bg-[#45475a] rounded-full flex items-center justify-center mr-2">
                   <Gamepad className="w-4 h-4 text-blue-400" />
@@ -107,17 +111,33 @@ export const ArchMenu: React.FC<ArchMenuProps> = ({
                 </div>
               </button>
 
-              <button className="flex items-center p-2 rounded-md text-left hover:bg-[#313244] group">
+              <button
+                onClick={() => {
+                  if (onAboutOpen) {
+                    onAboutOpen();
+                    onClose();
+                  }
+                }}
+                className="flex items-center p-2 rounded-md text-left hover:bg-[#313244] active:scale-[0.98] transition-all group"
+              >
                 <div className="w-8 h-8 bg-[#313244] group-hover:bg-[#45475a] rounded-full flex items-center justify-center mr-2">
                   <Info className="w-4 h-4 text-yellow-400" />
                 </div>
                 <div>
                   <div className="text-gray-300 font-medium">About</div>
-                  <div className="text-gray-500 text-xs">Project information</div>
+                  <div className="text-gray-500 text-xs">About me</div>
                 </div>
               </button>
 
-              <button className="flex items-center p-2 rounded-md text-left hover:bg-[#313244] group">
+              <button
+                onClick={() => {
+                  if (onResumeOpen) {
+                    onResumeOpen();
+                    onClose();
+                  }
+                }}
+                className="flex items-center p-2 rounded-md text-left hover:bg-[#313244] active:scale-[0.98] transition-all group"
+              >
                 <div className="w-8 h-8 bg-[#313244] group-hover:bg-[#45475a] rounded-full flex items-center justify-center mr-2">
                   <FileText className="w-4 h-4 text-red-400" />
                 </div>

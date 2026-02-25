@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  Calendar, 
-  Music, 
+import {
+  Calendar,
+  Music,
   Image,
-  Paintbrush, 
-  Play, 
-  Pause, 
-  SkipForward, 
+  Paintbrush,
+  Play,
+  Pause,
+  SkipForward,
   SkipBack,
   X,
   Volume2,
@@ -17,11 +17,10 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
-import fs from 'fs';
-import path from 'path';
 import { useTheme } from "./theme-provider";
 import ColorPalette from './ColorPalette';
 import { animate } from "animejs";
+import { AudioVisualizer } from "./AudioVisualizer";
 
 interface TopBarProps {
   onArchClick?: () => void;
@@ -38,9 +37,9 @@ interface Song {
   path: string;
 }
 
-export const TopBar: React.FC<TopBarProps> = ({ 
-  onArchClick = () => {}, 
-  onBackgroundChange, 
+export const TopBar: React.FC<TopBarProps> = ({
+  onArchClick = () => { },
+  onBackgroundChange,
   onMusicOpen,
   onColorChange,
   onBackgroundSelectorOpen
@@ -54,15 +53,42 @@ export const TopBar: React.FC<TopBarProps> = ({
   const [backgroundIndex, setBackgroundIndex] = useState(0);
   const [backgrounds, setBackgrounds] = useState<string[]>([]);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
-  
+
   // Use the enhanced theme context
   const { cycleTheme, changeAccentColor } = useTheme();
 
-  // Demo songs data
+  // Demo songs data synced with MusicPlayer
   const songs: Song[] = [
-    { id: "1", name: "Lofi Study", artist: "Chillhop", path: "/music/lofi1.mp3" },
-    { id: "2", name: "Midnight Jazz", artist: "Jazzy Vibes", path: "/music/jazz1.mp3" },
-    { id: "3", name: "Ambient Space", artist: "Cosmic Dreams", path: "/music/ambient1.mp3" },
+    {
+      id: "1",
+      name: "Mila's OST",
+      artist: "MakenCat",
+      path: "/music/makencat-ambient-mila.mp3",
+    },
+    {
+      id: "2",
+      name: "First Day",
+      artist: "MakenCat",
+      path: "/music/makencat-ambient-firstday.mp3",
+    },
+    {
+      id: "3",
+      name: "Dance Cap 1",
+      artist: "MakenCat",
+      path: "/music/makencat-dancecap-1.mp3",
+    },
+    {
+      id: "4",
+      name: "Dance Cap 2",
+      artist: "MakenCat",
+      path: "/music/makencat-dancecap-2.mp3",
+    },
+    {
+      id: "5",
+      name: "Real Life",
+      artist: "MakenCat",
+      path: "/music/makencat-ambient-reallife.mp3",
+    },
   ];
 
   useEffect(() => {
@@ -74,7 +100,7 @@ export const TopBar: React.FC<TopBarProps> = ({
     // Initialize audio element
     const audio = new Audio();
     setAudioElement(audio);
-    
+
     // Fetch background images
     const loadBackgrounds = async () => {
       try {
@@ -93,7 +119,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         console.error("Failed to load backgrounds:", error);
       }
     };
-    
+
     loadBackgrounds();
 
     return () => {
@@ -128,12 +154,12 @@ export const TopBar: React.FC<TopBarProps> = ({
   // Skip to next song
   const nextSong = () => {
     if (!currentSong || !audioElement) return;
-    
+
     const currentIndex = songs.findIndex(song => song.id === currentSong.id);
     const nextIndex = (currentIndex + 1) % songs.length;
     setCurrentSong(songs[nextIndex]);
     audioElement.src = songs[nextIndex].path;
-    
+
     if (isPlaying) {
       audioElement.play();
     }
@@ -142,12 +168,12 @@ export const TopBar: React.FC<TopBarProps> = ({
   // Skip to previous song
   const prevSong = () => {
     if (!currentSong || !audioElement) return;
-    
+
     const currentIndex = songs.findIndex(song => song.id === currentSong.id);
     const prevIndex = (currentIndex - 1 + songs.length) % songs.length;
     setCurrentSong(songs[prevIndex]);
     audioElement.src = songs[prevIndex].path;
-    
+
     if (isPlaying) {
       audioElement.play();
     }
@@ -156,7 +182,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   // Toggle mute
   const toggleMute = () => {
     if (!audioElement) return;
-    
+
     audioElement.muted = !isMuted;
     setIsMuted(!isMuted);
   };
@@ -164,11 +190,11 @@ export const TopBar: React.FC<TopBarProps> = ({
   // Change volume
   const changeVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!audioElement) return;
-    
+
     const newVolume = parseInt(e.target.value, 10);
     setVolume(newVolume);
     audioElement.volume = newVolume / 100;
-    
+
     if (newVolume === 0) {
       setIsMuted(true);
       audioElement.muted = true;
@@ -182,7 +208,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   const changeBackground = () => {
     // Use theme context to cycle themes
     cycleTheme();
-    
+
     // Also call the passed in handler if available
     if (onBackgroundChange) {
       onBackgroundChange();
@@ -200,7 +226,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   const handleColorChange = (colorHsl: string, colorName: string) => {
     // Use the context function instead of direct DOM manipulation
     changeAccentColor(colorHsl, colorName);
-    
+
     // Call external handler if provided
     if (onColorChange) {
       onColorChange(colorHsl, colorName);
@@ -212,9 +238,9 @@ export const TopBar: React.FC<TopBarProps> = ({
       <div className="absolute top-0 left-0 right-0 h-12 bg-[#252525]/40 backdrop-blur-lg border-b border-[#424242]/30 flex items-center justify-between px-4 z-50">
         {/* Left section - Arch menu button */}
         <div className="flex items-center">
-          <button 
+          <button
             onClick={onArchClick}
-            className="arch-button flex items-center justify-center w-9 h-9 rounded-full bg-blue-500/20 hover:bg-blue-500/40 backdrop-blur-md transition-colors"
+            className="arch-button flex items-center justify-center w-9 h-9 rounded-full bg-blue-500/20 hover:bg-blue-500/40 active:scale-95 backdrop-blur-md transition-all"
           >
             <img src="/arch-linux.png" alt="Arch Linux" className="w-5 h-5" />
           </button>
@@ -232,7 +258,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
           {/* Music controller */}
           <div className="bg-[#2a2a2a]/60 backdrop-blur-md text-gray-300 flex items-center px-3 py-1.5 rounded-full">
-            <button 
+            <button
               onClick={() => {
                 if (onMusicOpen) {
                   onMusicOpen();
@@ -240,12 +266,13 @@ export const TopBar: React.FC<TopBarProps> = ({
                   setIsMusicPlayerOpen(!isMusicPlayerOpen);
                 }
               }}
-              className="flex items-center hover:text-white transition-colors"
+              className="flex items-center hover:text-white active:scale-95 transition-all"
             >
               <Music className="w-4 h-4 mr-2" />
-              <span className="text-sm">
+              <span className="text-sm mr-2 block truncate max-w-[120px]">
                 {currentSong ? `${currentSong.name} - ${currentSong.artist}` : "Music"}
               </span>
+              <AudioVisualizer type="bars" width={30} height={14} color="#89b4fa" />
             </button>
           </div>
         </div>
@@ -253,18 +280,18 @@ export const TopBar: React.FC<TopBarProps> = ({
         {/* Right section - Theme buttons */}
         <div className="flex items-center space-x-3">
           <ColorPalette onColorChange={handleColorChange} />
-          
-          <button 
+
+          <button
             onClick={handleBackgroundSelectorOpen}
-            className="bg-[#2a2a2a]/60 backdrop-blur-md flex items-center justify-center w-9 h-9 rounded-full hover:bg-[#3a3a3a]/60 transition-colors"
+            className="bg-[#2a2a2a]/60 backdrop-blur-md flex items-center justify-center w-9 h-9 rounded-full hover:bg-[#3a3a3a]/60 active:scale-95 transition-all"
             title="Select Background"
           >
             <ImageIcon className="w-4 h-4" />
           </button>
-          
-          <button 
+
+          <button
             onClick={changeBackground}
-            className="theme-button bg-[#2a2a2a]/60 backdrop-blur-md flex items-center justify-center w-9 h-9 rounded-full hover:bg-[#3a3a3a]/60 transition-colors"
+            className="theme-button bg-[#2a2a2a]/60 backdrop-blur-md flex items-center justify-center w-9 h-9 rounded-full hover:bg-[#3a3a3a]/60 active:scale-95 transition-all"
             title="Change theme"
           >
             <Paintbrush className="w-4 h-4" />
@@ -284,7 +311,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             <div className="p-4">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-gray-300 font-semibold">Music Player</h3>
-                <button 
+                <button
                   onClick={() => setIsMusicPlayerOpen(false)}
                   className="text-gray-400 hover:text-gray-200"
                 >
@@ -308,8 +335,8 @@ export const TopBar: React.FC<TopBarProps> = ({
                   <button onClick={prevSong} className="text-gray-300 hover:text-white">
                     <SkipBack className="w-5 h-5" />
                   </button>
-                  <button 
-                    onClick={togglePlay} 
+                  <button
+                    onClick={togglePlay}
                     className="bg-blue-600 hover:bg-blue-700 rounded-full p-2"
                   >
                     {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
@@ -323,7 +350,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                   <button onClick={toggleMute} className="text-gray-300 hover:text-white">
                     {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                   </button>
-                  <input 
+                  <input
                     type="range"
                     min="0"
                     max="100"
@@ -348,9 +375,8 @@ export const TopBar: React.FC<TopBarProps> = ({
                             setIsPlaying(true);
                           }
                         }}
-                        className={`w-full text-left p-2 rounded-md text-sm hover:bg-[#303030] ${
-                          currentSong?.id === song.id ? "bg-[#303030] text-blue-400" : "text-gray-300"
-                        }`}
+                        className={`w-full text-left p-2 rounded-md text-sm hover:bg-[#303030] ${currentSong?.id === song.id ? "bg-[#303030] text-blue-400" : "text-gray-300"
+                          }`}
                       >
                         <div className="flex items-center">
                           <div className="flex-grow">

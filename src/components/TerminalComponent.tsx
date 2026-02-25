@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import 'xterm/css/xterm.css';
+import '@xterm/xterm/css/xterm.css';
 import { createTerminal } from '@/utils/terminal';
 
 interface TerminalComponentProps {
@@ -53,12 +53,12 @@ const TerminalComponent: React.FC<TerminalComponentProps> = ({
     // Create a ResizeObserver to monitor container size changes
     const resizeObserver = new ResizeObserver(() => {
       if (!termInstanceRef.current) return;
-      
+
       // Clear any pending resize to avoid excessive calls
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
       }
-      
+
       // Debounce the resize operation
       resizeTimeoutRef.current = setTimeout(() => {
         try {
@@ -70,9 +70,9 @@ const TerminalComponent: React.FC<TerminalComponentProps> = ({
         }
       }, 100); // 100ms debounce
     });
-    
+
     resizeObserver.observe(terminalRef.current);
-    
+
     return () => {
       resizeObserver.disconnect();
       if (resizeTimeoutRef.current) {
@@ -82,7 +82,7 @@ const TerminalComponent: React.FC<TerminalComponentProps> = ({
   }, []);
 
   return (
-    <div 
+    <div
       className={`terminal-container h-full w-full ${className}`}
       ref={terminalRef}
     />
