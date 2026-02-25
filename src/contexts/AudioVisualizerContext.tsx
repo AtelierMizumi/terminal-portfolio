@@ -16,29 +16,42 @@ export const useAudioVisualizer = () => useContext(GlobalAudioContext);
 
 export const AudioVisualizerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
-    const isInitialized = useRef(false);
+    const audioContextRef = useRef<AudioContext | null>(null);
+    const connectedElementRef = useRef<HTMLAudioElement | null>(null);
 
     const initAudioContext = (audioElement: HTMLAudioElement) => {
-        if (isInitialized.current) return;
-
         try {
-            // Create AudioContext only after user interaction
             const AudioContextCtor = window.AudioContext || (window as any).webkitAudioContext;
             if (!AudioContextCtor) return;
 
-            const ctx = new AudioContextCtor();
+            let ctx = audioContextRef.current;
+            if (!ctx) {
+                ctx = new AudioContextCtor();
+                audioContextRef.current = ctx;
+            }
+
+            if (ctx.state === 'suspended') {
+                ctx.resume();
+            }
+
+            // Return early if we already connected this specific audio element
+            if (connectedElementRef.current === audioElement) {
+                return;
+            }
+
+            let analyserNode = analyser;
+            if (!analyserNode) {
+                analyserNode = ctx.createAnalyser();
+                analyserNode.fftSize = 256;
+                analyserNode.smoothingTimeConstant = 0.8;
+                setAnalyser(analyserNode);
+            }
+
             const source = ctx.createMediaElementSource(audioElement);
-            const analyserNode = ctx.createAnalyser();
-
-            // Configure analyser
-            analyserNode.fftSize = 256;
-            analyserNode.smoothingTimeConstant = 0.8;
-
             source.connect(analyserNode);
             analyserNode.connect(ctx.destination);
 
-            setAnalyser(analyserNode);
-            isInitialized.current = true;
+            connectedElementRef.current = audioElement;
         } catch (e) {
             console.warn("Could not initialize AudioContext", e);
         }

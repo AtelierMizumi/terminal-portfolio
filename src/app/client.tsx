@@ -67,6 +67,7 @@ export const Client: React.FC = () => {
   // Easter Eggs
   const [coffees, setCoffees] = useState<{ id: string, x: number, y: number }[]>([]);
   const [isRaining, setIsRaining] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const clientRef = useRef<HTMLDivElement>(null);
   const animationScope = useRef<any>(null);
@@ -303,6 +304,12 @@ export const Client: React.FC = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   return (
     <AudioVisualizerProvider>
       <ThemeProvider>
@@ -337,9 +344,17 @@ export const Client: React.FC = () => {
 
               {/* Rain Overlay */}
               {isRaining && (
-                <div className="absolute inset-0 pointer-events-none z-0">
-                  <div className="w-full h-full opacity-30 bg-[url('https://media.giphy.com/media/Il9f7ZhytEiI0/giphy.gif')] bg-cover mix-blend-screen" />
-                  <div className="absolute inset-0 bg-blue-900/10 mix-blend-multiply" />
+                <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+                  <div
+                    className="w-full h-full opacity-40 mix-blend-screen"
+                    style={{
+                      backgroundImage: "url('https://media.giphy.com/media/Il9f7ZhytEiI0/giphy.gif')",
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat'
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-[#1e1e2e]/20 mix-blend-multiply" />
                 </div>
               )}
 

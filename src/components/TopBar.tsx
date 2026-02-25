@@ -99,6 +99,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
     // Initialize audio element
     const audio = new Audio();
+    audio.crossOrigin = "anonymous";
     setAudioElement(audio);
 
     // Fetch background images
@@ -132,23 +133,33 @@ export const TopBar: React.FC<TopBarProps> = ({
   }, []);
 
   // Play/pause music
-  const togglePlay = () => {
+  const togglePlay = async () => {
     if (!audioElement || !currentSong) {
       if (songs.length > 0 && audioElement) {
         setCurrentSong(songs[0]);
         audioElement.src = songs[0].path;
-        audioElement.play();
-        setIsPlaying(true);
+        audioElement.load();
+        try {
+          await audioElement.play();
+          setIsPlaying(true);
+        } catch (err) {
+          console.error("Audio playback error:", err);
+        }
       }
       return;
     }
 
-    if (isPlaying) {
-      audioElement.pause();
-    } else {
-      audioElement.play();
+    try {
+      if (isPlaying) {
+        audioElement.pause();
+        setIsPlaying(false);
+      } else {
+        await audioElement.play();
+        setIsPlaying(true);
+      }
+    } catch (err) {
+      console.error("Audio playback error:", err);
     }
-    setIsPlaying(!isPlaying);
   };
 
   // Skip to next song
@@ -242,7 +253,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             onClick={onArchClick}
             className="arch-button flex items-center justify-center w-9 h-9 rounded-full bg-blue-500/20 hover:bg-blue-500/40 active:scale-95 backdrop-blur-md transition-all"
           >
-            <img src="/arch-linux.png" alt="Arch Linux" className="w-5 h-5" />
+            <img src="/arch-linux.png" alt="Arch Linux" className="w-5 h-5 object-contain" />
           </button>
         </div>
 

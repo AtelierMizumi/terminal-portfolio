@@ -30,7 +30,7 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
       cursorBlink: true,
       cursorStyle: 'block',
       theme: {
-        background: '#1a1a1a',
+        background: 'transparent',
         foreground: '#f0f0f0',
         black: '#000000',
         red: '#e06c75',
@@ -40,6 +40,14 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
         magenta: '#c678dd',
         cyan: '#56b6c2',
         white: '#d0d0d0',
+        brightBlack: '#5c6370',
+        brightRed: '#e06c75',
+        brightGreen: '#98c379',
+        brightYellow: '#e5c07b',
+        brightBlue: '#61afef',
+        brightMagenta: '#c678dd',
+        brightCyan: '#56b6c2',
+        brightWhite: '#ffffff',
       },
       allowTransparency: true,
       scrollback: 1000,
@@ -73,7 +81,7 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
       // Set some initial text
       terminal.write('\x1b[1;32m$ Welcomes to my cozy place!\x1b[0m\r\n');
       terminal.write('\x1b[1;37mType "help" to see available commands.\x1b[0m\r\n\r\n');
-      terminal.write('$ ');
+      terminal.write('\x1b[1;32muser@portfolio\x1b[0m:\x1b[1;34m~\x1b[1;32m$\x1b[0m ');
 
       // Set terminal ready state
       setTerminalReady(true);
@@ -123,7 +131,7 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
           // Process command
           processCommand(currentLine, terminal, commandHistory);
         } else {
-          terminal.write('$ ');
+          terminal.write('\x1b[1;32muser@portfolio\x1b[0m:\x1b[1;34m~\x1b[1;32m$\x1b[0m ');
         }
 
         // Reset current line
@@ -195,7 +203,7 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
               // Found multiple matches, show them
               terminal.writeln('');
               terminal.writeln('\x1b[1;36m' + matches.join('  ') + '\x1b[0m');
-              terminal.write('$ ' + currentLine);
+              terminal.write('\x1b[1;32muser@portfolio\x1b[0m:\x1b[1;34m~\x1b[1;32m$\x1b[0m ' + currentLine);
             }
           } else if (parts[0].toLowerCase() === 'cat') {
             // Rudimentary completion for cat command
@@ -211,7 +219,7 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
             } else if (matches.length > 1) {
               terminal.writeln('');
               terminal.writeln('\x1b[1;32m' + matches.join('  ') + '\x1b[0m');
-              terminal.write('$ ' + currentLine);
+              terminal.write('\x1b[1;32muser@portfolio\x1b[0m:\x1b[1;34m~\x1b[1;32m$\x1b[0m ' + currentLine);
             }
           } else if (parts[0].toLowerCase() === 'open') {
             // Completion for open command
@@ -227,7 +235,7 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
             } else if (matches.length > 1) {
               terminal.writeln('');
               terminal.writeln('\x1b[1;34m' + matches.join('  ') + '\x1b[0m');
-              terminal.write('$ ' + currentLine);
+              terminal.write('\x1b[1;32muser@portfolio\x1b[0m:\x1b[1;34m~\x1b[1;32m$\x1b[0m ' + currentLine);
             }
           }
         }
@@ -263,7 +271,12 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
         terminal.writeln(`  ${i + 1}  ${h}`);
       });
     } else if (cmd in commands) {
-      await commands[cmd](terminal, args);
+      try {
+        await commands[cmd](terminal, args);
+      } catch (err: any) {
+        terminal.writeln(`\r\n\x1b[1;31mError: ${err.message || 'Unknown error during execution'}\x1b[0m`);
+        console.error("Command error:", err);
+      }
     } else if (cmd === '') {
       // Do nothing for empty command
     } else {
@@ -272,7 +285,7 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
     }
 
     // Always show prompt after command execution
-    terminal.write('\r\n$ ');
+    terminal.write('\r\n\x1b[1;32muser@portfolio\x1b[0m:\x1b[1;34m~\x1b[1;32m$\x1b[0m ');
   };
 
   // Handle ResizeObserver with better debouncing

@@ -17,8 +17,8 @@ export const DesktopIcon: React.FC<DesktopIconProps> = ({ icon, label, onClick, 
             initial={{ x, y }}
             whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
             whileTap={{ scale: 0.95 }}
-            className="absolute w-20 flex flex-col items-center gap-1 p-2 rounded-lg cursor-pointer text-center z-10"
-            onDoubleClick={(e) => {
+            className="w-20 flex flex-col items-center gap-1 p-2 rounded-lg cursor-pointer text-center z-0"
+            onClick={(e) => {
                 e.stopPropagation();
                 onClick();
             }}

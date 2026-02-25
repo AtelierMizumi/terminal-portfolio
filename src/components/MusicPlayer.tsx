@@ -48,36 +48,36 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ className }) => {
   const songs: Song[] = [
     {
       id: "1",
-      name: "Mila's OST",
-      artist: "MakenCat",
+      name: "Chill Lofi Track 1",
+      artist: "Unknown Artist",
       path: "/music/makencat-ambient-mila.mp3",
       cover: "/music/covers/makencat-ambient-mila.png"
     },
     {
       id: "2",
-      name: "First Day",
-      artist: "MakenCat",
+      name: "Ambient Vibes",
+      artist: "Unknown Artist",
       path: "/music/makencat-ambient-firstday.mp3",
       cover: "/music/covers/default-cover.jpg"
     },
     {
       id: "3",
-      name: "Dance Cap 1",
-      artist: "MakenCat",
+      name: "Electronic Beat",
+      artist: "Unknown Artist",
       path: "/music/makencat-dancecap-1.mp3",
       cover: "/music/covers/cappie.jpg"
     },
     {
       id: "4",
-      name: "Dance Cap 2",
-      artist: "MakenCat",
+      name: "Dance Groove",
+      artist: "Unknown Artist",
       path: "/music/makencat-dancecap-2.mp3",
       cover: "/music/covers/cappie.jpg"
     },
     {
       id: "5",
-      name: "Real Life",
-      artist: "MakenCat",
+      name: "Relaxing Melody",
+      artist: "Unknown Artist",
       path: "/music/makencat-ambient-reallife.mp3",
       cover: "/music/covers/default-cover.jpg"
     },
@@ -86,6 +86,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ className }) => {
   useEffect(() => {
     // Initialize audio element
     const audio = new Audio();
+    audio.crossOrigin = "anonymous";
     audio.volume = volume / 100;
     audio.loop = isLooping;
     audioRef.current = audio;
@@ -95,12 +96,11 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ className }) => {
       setDuration(audio.duration);
     });
 
-    audio.addEventListener("ended", handleSongEnd);
-
     // Load first song by default
     if (songs.length > 0) {
       setCurrentSong(songs[0]);
       audio.src = songs[0].path;
+      audio.load();
     }
 
     return () => {
@@ -108,19 +108,27 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ className }) => {
         clearInterval(progressIntervalRef.current);
       }
 
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = "";
-        audioRef.current.removeEventListener("ended", handleSongEnd);
-      }
+      audio.pause();
+      audio.src = "";
     };
-  }, []);
+  }, []); // Run only once on mount
+
+  // Sync state and handlers that rely on latest closure
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.onended = () => {
+        if (!isLooping) {
+          nextSong();
+        }
+      };
+      audioRef.current.loop = isLooping;
+      audioRef.current.volume = volume / 100;
+    }
+  });
 
   // Handle song end
   const handleSongEnd = () => {
-    if (!isLooping) {
-      nextSong();
-    }
+    // Note: Replaced by onended in useEffect
   };
 
   // Update progress bar
@@ -152,7 +160,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ className }) => {
         progressIntervalRef.current = null;
       }
     } else {
-      audioRef.current.play();
+      audioRef.current.play().catch(e => console.error("Audio play error:", e));
       progressIntervalRef.current = setInterval(updateProgress, 1000);
     }
 
@@ -177,10 +185,11 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ className }) => {
 
     setCurrentSong(songs[nextIndex]);
     audioRef.current.src = songs[nextIndex].path;
+    audioRef.current.load();
     setProgress(0);
 
     if (isPlaying) {
-      audioRef.current.play();
+      audioRef.current.play().catch(e => console.error("Audio play error:", e));
     }
   };
 
@@ -192,10 +201,11 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ className }) => {
     const prevIndex = (currentIndex - 1 + songs.length) % songs.length;
     setCurrentSong(songs[prevIndex]);
     audioRef.current.src = songs[prevIndex].path;
+    audioRef.current.load();
     setProgress(0);
 
     if (isPlaying) {
-      audioRef.current.play();
+      audioRef.current.play().catch(e => console.error("Audio play error:", e));
     }
   };
 
