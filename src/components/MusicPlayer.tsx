@@ -28,233 +28,34 @@ interface Song {
 }
 
 const MusicPlayer: React.FC<MusicPlayerProps> = ({ className }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentSong, setCurrentSong] = useState<Song | null>(null);
-  const [volume, setVolume] = useState(70);
-  const [isMuted, setIsMuted] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [isLooping, setIsLooping] = useState(true);
-  const [isShuffle, setIsShuffle] = useState(false);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
 
-  const { initAudioContext } = useAudioVisualizer();
-
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Demo songs data
-  const songs: Song[] = [
-    {
-      id: "1",
-      name: "Chill Lofi Track 1",
-      artist: "Unknown Artist",
-      path: "/music/makencat-ambient-mila.mp3",
-      cover: "/music/covers/makencat-ambient-mila.png"
-    },
-    {
-      id: "2",
-      name: "Ambient Vibes",
-      artist: "Unknown Artist",
-      path: "/music/makencat-ambient-firstday.mp3",
-      cover: "/music/covers/default-cover.jpg"
-    },
-    {
-      id: "3",
-      name: "Electronic Beat",
-      artist: "Unknown Artist",
-      path: "/music/makencat-dancecap-1.mp3",
-      cover: "/music/covers/cappie.jpg"
-    },
-    {
-      id: "4",
-      name: "Dance Groove",
-      artist: "Unknown Artist",
-      path: "/music/makencat-dancecap-2.mp3",
-      cover: "/music/covers/cappie.jpg"
-    },
-    {
-      id: "5",
-      name: "Relaxing Melody",
-      artist: "Unknown Artist",
-      path: "/music/makencat-ambient-reallife.mp3",
-      cover: "/music/covers/default-cover.jpg"
-    },
-  ];
-
-  useEffect(() => {
-    // Initialize audio element
-    const audio = new Audio();
-    audio.crossOrigin = "anonymous";
-    audio.volume = volume / 100;
-    audio.loop = isLooping;
-    audioRef.current = audio;
-
-    // Set up event listeners
-    audio.addEventListener("loadedmetadata", () => {
-      setDuration(audio.duration);
-    });
-
-    // Load first song by default
-    if (songs.length > 0) {
-      setCurrentSong(songs[0]);
-      audio.src = songs[0].path;
-      audio.load();
-    }
-
-    return () => {
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-      }
-
-      audio.pause();
-      audio.src = "";
-    };
-  }, []); // Run only once on mount
-
-  // Sync state and handlers that rely on latest closure
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.onended = () => {
-        if (!isLooping) {
-          nextSong();
-        }
-      };
-      audioRef.current.loop = isLooping;
-      audioRef.current.volume = volume / 100;
-    }
-  });
-
-  // Handle song end
-  const handleSongEnd = () => {
-    // Note: Replaced by onended in useEffect
-  };
-
-  // Update progress bar
-  const updateProgress = () => {
-    if (audioRef.current) {
-      setProgress(audioRef.current.currentTime);
-    }
-  };
+  const {
+    isPlaying,
+    currentSong,
+    volume,
+    isMuted,
+    progress,
+    duration,
+    isLooping,
+    isShuffle,
+    togglePlay,
+    nextSong,
+    prevSong,
+    changeVolume,
+    toggleMute,
+    seekTrack,
+    toggleLoop,
+    toggleShuffle
+  } = useAudioVisualizer();
 
   // Format time (seconds to MM:SS)
   const formatTime = (seconds: number): string => {
+    if (!seconds || isNaN(seconds)) return "0:00";
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  // Toggle play/pause
-  const togglePlay = () => {
-    if (!audioRef.current || !currentSong) return;
-
-    if (!isPlaying) {
-      initAudioContext(audioRef.current);
-    }
-
-    if (isPlaying) {
-      audioRef.current.pause();
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-        progressIntervalRef.current = null;
-      }
-    } else {
-      audioRef.current.play().catch(e => console.error("Audio play error:", e));
-      progressIntervalRef.current = setInterval(updateProgress, 1000);
-    }
-
-    setIsPlaying(!isPlaying);
-  };
-
-  // Skip to next song
-  const nextSong = () => {
-    if (!currentSong || !audioRef.current) return;
-
-    const currentIndex = songs.findIndex(song => song.id === currentSong.id);
-    let nextIndex: number;
-
-    if (isShuffle) {
-      // Generate random index different from current
-      do {
-        nextIndex = Math.floor(Math.random() * songs.length);
-      } while (nextIndex === currentIndex && songs.length > 1);
-    } else {
-      nextIndex = (currentIndex + 1) % songs.length;
-    }
-
-    setCurrentSong(songs[nextIndex]);
-    audioRef.current.src = songs[nextIndex].path;
-    audioRef.current.load();
-    setProgress(0);
-
-    if (isPlaying) {
-      audioRef.current.play().catch(e => console.error("Audio play error:", e));
-    }
-  };
-
-  // Skip to previous song
-  const prevSong = () => {
-    if (!currentSong || !audioRef.current) return;
-
-    const currentIndex = songs.findIndex(song => song.id === currentSong.id);
-    const prevIndex = (currentIndex - 1 + songs.length) % songs.length;
-    setCurrentSong(songs[prevIndex]);
-    audioRef.current.src = songs[prevIndex].path;
-    audioRef.current.load();
-    setProgress(0);
-
-    if (isPlaying) {
-      audioRef.current.play().catch(e => console.error("Audio play error:", e));
-    }
-  };
-
-  // Toggle mute
-  const toggleMute = () => {
-    if (!audioRef.current) return;
-
-    audioRef.current.muted = !isMuted;
-    setIsMuted(!isMuted);
-  };
-
-  // Change volume
-  const changeVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!audioRef.current) return;
-
-    const newVolume = parseInt(e.target.value, 10);
-    setVolume(newVolume);
-    audioRef.current.volume = newVolume / 100;
-
-    if (newVolume === 0) {
-      setIsMuted(true);
-      audioRef.current.muted = true;
-    } else if (isMuted) {
-      setIsMuted(false);
-      audioRef.current.muted = false;
-    }
-  };
-
-  // Seek in track
-  const seekTrack = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!audioRef.current) return;
-
-    const seekTime = parseFloat(e.target.value);
-    audioRef.current.currentTime = seekTime;
-    setProgress(seekTime);
-  };
-
-  // Toggle loop mode
-  const toggleLoop = () => {
-    if (!audioRef.current) return;
-
-    const newLoopingState = !isLooping;
-    audioRef.current.loop = newLoopingState;
-    setIsLooping(newLoopingState);
-  };
-
-  // Toggle shuffle mode
-  const toggleShuffle = () => {
-    setIsShuffle(!isShuffle);
   };
 
   return (
@@ -374,7 +175,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ className }) => {
               min="0"
               max={duration || 0}
               value={progress}
-              onChange={seekTrack}
+              onChange={(e) => seekTrack(parseFloat(e.target.value))}
               className="w-full h-1.5 appearance-none bg-gray-700 rounded-lg overflow-hidden cursor-pointer
                 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 
                 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:cursor-pointer
@@ -454,7 +255,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ className }) => {
                 min="0"
                 max="100"
                 value={volume}
-                onChange={changeVolume}
+                onChange={(e) => changeVolume(parseInt(e.target.value, 10))}
                 className="w-full h-1.5 appearance-none bg-gray-700 rounded-lg cursor-pointer 
                   [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 
                   [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:cursor-pointer
@@ -472,8 +273,6 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ className }) => {
         </div>
       </div>
 
-      {/* Hidden audio element */}
-      <audio ref={audioRef} style={{ display: 'none' }} />
     </div>
   );
 };

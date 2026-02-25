@@ -21,6 +21,7 @@ import { useTheme } from "./theme-provider";
 import ColorPalette from './ColorPalette';
 import { animate } from "animejs";
 import { AudioVisualizer } from "./AudioVisualizer";
+import { useAudioVisualizer, DEMO_SONGS } from "@/contexts/AudioVisualizerContext";
 
 interface TopBarProps {
   onArchClick?: () => void;
@@ -46,61 +47,30 @@ export const TopBar: React.FC<TopBarProps> = ({
 }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isMusicPlayerOpen, setIsMusicPlayerOpen] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentSong, setCurrentSong] = useState<Song | null>(null);
-  const [volume, setVolume] = useState(70);
-  const [isMuted, setIsMuted] = useState(false);
   const [backgroundIndex, setBackgroundIndex] = useState(0);
   const [backgrounds, setBackgrounds] = useState<string[]>([]);
-  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
 
   // Use the enhanced theme context
   const { cycleTheme, changeAccentColor } = useTheme();
 
-  // Demo songs data synced with MusicPlayer
-  const songs: Song[] = [
-    {
-      id: "1",
-      name: "Mila's OST",
-      artist: "MakenCat",
-      path: "/music/makencat-ambient-mila.mp3",
-    },
-    {
-      id: "2",
-      name: "First Day",
-      artist: "MakenCat",
-      path: "/music/makencat-ambient-firstday.mp3",
-    },
-    {
-      id: "3",
-      name: "Dance Cap 1",
-      artist: "MakenCat",
-      path: "/music/makencat-dancecap-1.mp3",
-    },
-    {
-      id: "4",
-      name: "Dance Cap 2",
-      artist: "MakenCat",
-      path: "/music/makencat-dancecap-2.mp3",
-    },
-    {
-      id: "5",
-      name: "Real Life",
-      artist: "MakenCat",
-      path: "/music/makencat-ambient-reallife.mp3",
-    },
-  ];
+  const {
+    isPlaying,
+    currentSong,
+    volume,
+    isMuted,
+    togglePlay,
+    playSong,
+    nextSong,
+    prevSong,
+    changeVolume,
+    toggleMute
+  } = useAudioVisualizer();
 
   useEffect(() => {
     // Update clock every second
     const interval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-
-    // Initialize audio element
-    const audio = new Audio();
-    audio.crossOrigin = "anonymous";
-    setAudioElement(audio);
 
     // Fetch background images
     const loadBackgrounds = async () => {
@@ -125,95 +95,8 @@ export const TopBar: React.FC<TopBarProps> = ({
 
     return () => {
       clearInterval(interval);
-      if (audioElement) {
-        audioElement.pause();
-        audioElement.src = "";
-      }
     };
   }, []);
-
-  // Play/pause music
-  const togglePlay = async () => {
-    if (!audioElement || !currentSong) {
-      if (songs.length > 0 && audioElement) {
-        setCurrentSong(songs[0]);
-        audioElement.src = songs[0].path;
-        audioElement.load();
-        try {
-          await audioElement.play();
-          setIsPlaying(true);
-        } catch (err) {
-          console.error("Audio playback error:", err);
-        }
-      }
-      return;
-    }
-
-    try {
-      if (isPlaying) {
-        audioElement.pause();
-        setIsPlaying(false);
-      } else {
-        await audioElement.play();
-        setIsPlaying(true);
-      }
-    } catch (err) {
-      console.error("Audio playback error:", err);
-    }
-  };
-
-  // Skip to next song
-  const nextSong = () => {
-    if (!currentSong || !audioElement) return;
-
-    const currentIndex = songs.findIndex(song => song.id === currentSong.id);
-    const nextIndex = (currentIndex + 1) % songs.length;
-    setCurrentSong(songs[nextIndex]);
-    audioElement.src = songs[nextIndex].path;
-
-    if (isPlaying) {
-      audioElement.play();
-    }
-  };
-
-  // Skip to previous song
-  const prevSong = () => {
-    if (!currentSong || !audioElement) return;
-
-    const currentIndex = songs.findIndex(song => song.id === currentSong.id);
-    const prevIndex = (currentIndex - 1 + songs.length) % songs.length;
-    setCurrentSong(songs[prevIndex]);
-    audioElement.src = songs[prevIndex].path;
-
-    if (isPlaying) {
-      audioElement.play();
-    }
-  };
-
-  // Toggle mute
-  const toggleMute = () => {
-    if (!audioElement) return;
-
-    audioElement.muted = !isMuted;
-    setIsMuted(!isMuted);
-  };
-
-  // Change volume
-  const changeVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!audioElement) return;
-
-    const newVolume = parseInt(e.target.value, 10);
-    setVolume(newVolume);
-    audioElement.volume = newVolume / 100;
-
-    if (newVolume === 0) {
-      setIsMuted(true);
-      audioElement.muted = true;
-    } else if (isMuted) {
-      setIsMuted(false);
-      audioElement.muted = false;
-    }
-  };
 
   // Change background/theme
   const changeBackground = () => {
@@ -366,7 +249,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     min="0"
                     max="100"
                     value={volume}
-                    onChange={changeVolume}
+                    onChange={(e) => changeVolume(parseInt(e.target.value, 10))}
                     className="w-full h-1.5 rounded-lg appearance-none bg-[#333] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-500"
                   />
                 </div>
@@ -375,17 +258,10 @@ export const TopBar: React.FC<TopBarProps> = ({
               <div className="max-h-40 overflow-y-auto">
                 <h4 className="text-gray-400 text-xs uppercase font-semibold mb-2">Library</h4>
                 <ul className="space-y-1">
-                  {songs.map((song) => (
+                  {DEMO_SONGS.map((song) => (
                     <li key={song.id}>
                       <button
-                        onClick={() => {
-                          setCurrentSong(song);
-                          if (audioElement) {
-                            audioElement.src = song.path;
-                            audioElement.play();
-                            setIsPlaying(true);
-                          }
-                        }}
+                        onClick={() => playSong(song)}
                         className={`w-full text-left p-2 rounded-md text-sm hover:bg-[#303030] ${currentSong?.id === song.id ? "bg-[#303030] text-blue-400" : "text-gray-300"
                           }`}
                       >

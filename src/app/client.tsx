@@ -167,6 +167,12 @@ export const Client: React.FC = () => {
 
   // Create a music player window
   const openMusicPlayer = useCallback(() => {
+    const existing = windows.find(w => w.type === "music");
+    if (existing) {
+      bringToFront(existing.id);
+      return;
+    }
+
     const newZIndex = maxZIndex + 1;
     const newId = `music-${Date.now()}`;
 
@@ -184,7 +190,7 @@ export const Client: React.FC = () => {
 
     setMaxZIndex(newZIndex);
     setActiveWindowId(newId);
-  }, [maxZIndex]);
+  }, [windows, maxZIndex, bringToFront]);
 
   // Close a window
   const closeWindow = useCallback((id: string) => {
@@ -193,6 +199,12 @@ export const Client: React.FC = () => {
 
   // Open About window
   const openAboutWindow = useCallback(() => {
+    const existing = windows.find(w => w.type === "about");
+    if (existing) {
+      bringToFront(existing.id);
+      return;
+    }
+
     const newZIndex = maxZIndex + 1;
     const newId = `about-${Date.now()}`;
     setWindows((prev) => [...prev, {
@@ -201,10 +213,16 @@ export const Client: React.FC = () => {
     }]);
     setMaxZIndex(newZIndex);
     setActiveWindowId(newId);
-  }, [maxZIndex]);
+  }, [windows, maxZIndex, bringToFront]);
 
   // Open Resume window
   const openResumeWindow = useCallback(() => {
+    const existing = windows.find(w => w.type === "resume");
+    if (existing) {
+      bringToFront(existing.id);
+      return;
+    }
+
     const newZIndex = maxZIndex + 1;
     const newId = `resume-${Date.now()}`;
     setWindows((prev) => [...prev, {
@@ -213,7 +231,7 @@ export const Client: React.FC = () => {
     }]);
     setMaxZIndex(newZIndex);
     setActiveWindowId(newId);
-  }, [maxZIndex]);
+  }, [windows, maxZIndex, bringToFront]);
 
   // Handle game launch
   const handleGameLaunch = useCallback((game: any) => {
