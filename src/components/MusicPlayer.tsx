@@ -6,6 +6,7 @@ import {
   Info,
   Pause,
   Play,
+  Repeat,
   Shuffle,
   SkipBack,
   SkipForward,
@@ -276,9 +277,8 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ className }) => {
         <div className="flex items-center gap-3 mb-2">
           <button
             onClick={toggleLoop}
-            className={`p-2 rounded-full transition-all active:scale-90 hover:bg-white/10 ${
-              isLooping ? "text-blue-400" : "text-gray-400 hover:text-white"
-            }`}
+            className={`p-2 rounded-full transition-all active:scale-90 hover:bg-white/10 ${isLooping ? "text-blue-400" : "text-gray-400 hover:text-white"
+              }`}
             title="Loop track"
           >
             {isLooping && (
@@ -289,9 +289,8 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ className }) => {
 
           <button
             onClick={toggleShuffle}
-            className={`p-2 rounded-full transition-all active:scale-90 hover:bg-white/10 ${
-              isShuffle ? "text-blue-400" : "text-gray-400 hover:text-white"
-            }`}
+            className={`p-2 rounded-full transition-all active:scale-90 hover:bg-white/10 ${isShuffle ? "text-blue-400" : "text-gray-400 hover:text-white"
+              }`}
             title="Shuffle tracks"
           >
             {isShuffle && (

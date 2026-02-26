@@ -203,6 +203,7 @@ export const Window: React.FC<WindowProps> = ({
     setIsDragging(false);
   };
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Callbacks are not memoized, we only want to bind/unbind when dragging/resizing state changes
   useEffect(() => {
     if (isDragging || isResizing) {
       document.addEventListener("mousemove", handleMouseMove);
@@ -237,6 +238,7 @@ export const Window: React.FC<WindowProps> = ({
   };
 
   // Enhanced open animation using anime.js
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Animation should only run once on mount
   useEffect(() => {
     if (windowRef.current) {
       animate(windowRef.current, {

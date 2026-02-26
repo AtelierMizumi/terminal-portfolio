@@ -51,8 +51,6 @@ export const TopBar: React.FC<TopBarProps> = ({
 }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isMusicPlayerOpen, setIsMusicPlayerOpen] = useState(false);
-  const [backgroundIndex, setBackgroundIndex] = useState(0);
-  const [backgrounds, setBackgrounds] = useState<string[]>([]);
 
   // Use the enhanced theme context
   const { cycleTheme, changeAccentColor } = useTheme();
@@ -75,27 +73,6 @@ export const TopBar: React.FC<TopBarProps> = ({
     const interval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
-
-    // Fetch background images
-    const loadBackgrounds = async () => {
-      try {
-        // In a real app, this would be a server API call
-        // For now, let's assume we have these backgrounds
-        setBackgrounds([
-          "/background/cyan-mountains.jpg",
-          "/background/islands.jpg",
-          "/background/yosemite.png",
-          "/background/blocks.png",
-          "/background/cat_pacman.png",
-          "/background/unicat.png",
-          "/background/nilou.mp4",
-        ]);
-      } catch (error) {
-        console.error("Failed to load backgrounds:", error);
-      }
-    };
-
-    loadBackgrounds();
 
     return () => {
       clearInterval(interval);

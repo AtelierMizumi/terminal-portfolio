@@ -58,14 +58,14 @@ const Terminal = dynamic(() => import("../components/Terminal"), {
 interface WindowData {
   id: string;
   type:
-  | "terminal"
-  | "game"
-  | "explorer"
-  | "music"
-  | "backgroundSelector"
-  | "about"
-  | "resume"
-  | "files";
+    | "terminal"
+    | "game"
+    | "explorer"
+    | "music"
+    | "backgroundSelector"
+    | "about"
+    | "resume"
+    | "files";
   zIndex: number;
   initialX: number;
   initialY: number;
@@ -397,6 +397,9 @@ export const Client: React.FC = () => {
         ]);
       } else if (detail?.type === "rain") {
         setIsRaining((prev) => !prev);
+      } else if (detail?.type === "chill") {
+        setBackground("/background/nilou.mp4");
+        openMusicPlayer();
       }
     };
 
@@ -407,7 +410,13 @@ export const Client: React.FC = () => {
       window.removeEventListener("terminal-open-app", handleOpenApp);
       window.removeEventListener("terminal-easter-egg", handleEasterEgg);
     };
-  }, [openMusicPlayer, openAboutWindow, openResumeWindow, openFileManager]);
+  }, [
+    openMusicPlayer,
+    openAboutWindow,
+    openResumeWindow,
+    openFileManager,
+    setBackground,
+  ]);
 
   // Desktop Parallax Effect
   useEffect(() => {

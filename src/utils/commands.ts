@@ -104,6 +104,9 @@ export const commands: Commands = {
       "\x1b[1;36m║\x1b[0m  \x1b[1;33mrain\x1b[0m       Toggle rain effect              \x1b[1;36m║\x1b[0m",
     );
     terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33mchill\x1b[0m      Set the lofi mood               \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
       "\x1b[1;36m╚════════════════════════════════════════════╝\x1b[0m",
     );
   },
@@ -432,6 +435,13 @@ export const commands: Commands = {
     terminal.writeln("\r\n  \x1b[1;34mIt's starting to rain... 🌧️\x1b[0m");
     window.dispatchEvent(
       new CustomEvent("terminal-easter-egg", { detail: { type: "rain" } }),
+    );
+  },
+
+  chill: async (terminal: Terminal) => {
+    terminal.writeln("\r\n  \x1b[1;35mSetting the mood... 🎧✨\x1b[0m");
+    window.dispatchEvent(
+      new CustomEvent("terminal-easter-egg", { detail: { type: "chill" } }),
     );
   },
 };

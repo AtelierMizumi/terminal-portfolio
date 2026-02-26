@@ -362,7 +362,7 @@ const Terminal: React.FC<TerminalProps> = ({ className = "" }) => {
         clearTimeout(resizeTimeoutRef.current);
       }
     };
-  }, [terminalReady]);
+  }, []);
 
   // Add listeners for window resize events
   useEffect(() => {
