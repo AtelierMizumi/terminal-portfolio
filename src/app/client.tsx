@@ -58,14 +58,14 @@ const Terminal = dynamic(() => import("../components/Terminal"), {
 interface WindowData {
   id: string;
   type:
-    | "terminal"
-    | "game"
-    | "explorer"
-    | "music"
-    | "backgroundSelector"
-    | "about"
-    | "resume"
-    | "files";
+  | "terminal"
+  | "game"
+  | "explorer"
+  | "music"
+  | "backgroundSelector"
+  | "about"
+  | "resume"
+  | "files";
   zIndex: number;
   initialX: number;
   initialY: number;
@@ -518,35 +518,35 @@ export const Client: React.FC = () => {
                     label="Music"
                     onClick={openMusicPlayer}
                     x={0}
-                    y={100}
+                    y={0}
                   />
                   <DesktopIcon
                     icon={<Gamepad2 size={24} />}
                     label="Games"
                     onClick={() => setGamesExplorerOpen(true)}
                     x={0}
-                    y={200}
+                    y={0}
                   />
                   <DesktopIcon
                     icon={<User size={24} />}
                     label="About"
                     onClick={openAboutWindow}
                     x={0}
-                    y={300}
+                    y={0}
                   />
                   <DesktopIcon
                     icon={<FileText size={24} />}
                     label="Resume"
                     onClick={openResumeWindow}
                     x={0}
-                    y={400}
+                    y={0}
                   />
                   <DesktopIcon
                     icon={<FolderOpen size={24} />}
                     label="Files"
                     onClick={openFileManager}
                     x={0}
-                    y={500}
+                    y={0}
                   />
                 </div>
               </div>

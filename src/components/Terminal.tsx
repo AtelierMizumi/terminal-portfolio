@@ -23,6 +23,11 @@ const Terminal: React.FC<TerminalProps> = ({ className = "" }) => {
 
   // Achievement tracking
   const { unlockAchievement } = useAchievements();
+  const unlockAchievementRef = useRef(unlockAchievement);
+  useEffect(() => {
+    unlockAchievementRef.current = unlockAchievement;
+  }, [unlockAchievement]);
+
   const commandCountRef = useRef(0);
 
   useEffect(() => {
@@ -293,7 +298,7 @@ const Terminal: React.FC<TerminalProps> = ({ className = "" }) => {
     if (cmd !== "") {
       commandCountRef.current += 1;
       if (commandCountRef.current >= 10) {
-        unlockAchievement("explorer");
+        unlockAchievementRef.current("explorer");
       }
     }
 

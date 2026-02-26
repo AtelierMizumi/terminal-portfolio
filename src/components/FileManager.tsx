@@ -205,7 +205,7 @@ const FileManager: React.FC<FileManagerProps> = ({ className = "" }) => {
   };
 
   return (
-    <div className={`flex h-full bg-[#0d0d0d] text-gray-200 ${className}`}>
+    <div className={`flex h-full bg-black/40 text-gray-200 ${className}`}>
       {/* Sidebar */}
       <div className="w-48 flex-shrink-0 bg-white/[0.02] border-r border-gray-800/50 flex flex-col">
         <div className="p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -233,12 +233,11 @@ const FileManager: React.FC<FileManagerProps> = ({ className = "" }) => {
             <button
               key={place.id}
               onClick={() => navigateTo(place.id)}
-              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
-                (currentPath.startsWith(place.id) && place.id !== "~") ||
-                (place.id === "~" && currentPath === "~")
+              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${(currentPath.startsWith(place.id) && place.id !== "~") ||
+                  (place.id === "~" && currentPath === "~")
                   ? "bg-purple-500/20 text-purple-300"
                   : "text-gray-400 hover:bg-white/5 hover:text-gray-200"
-              }`}
+                }`}
             >
               {place.icon}
               {place.label}
@@ -353,11 +352,11 @@ const FileManager: React.FC<FileManagerProps> = ({ className = "" }) => {
               ))}
               {(!currentFolder?.children ||
                 currentFolder.children.length === 0) && (
-                <div className="col-span-full flex flex-col items-center justify-center py-12 text-gray-500">
-                  <Folder className="w-12 h-12 mb-3 opacity-20" />
-                  <p className="text-sm">This folder is empty</p>
-                </div>
-              )}
+                  <div className="col-span-full flex flex-col items-center justify-center py-12 text-gray-500">
+                    <Folder className="w-12 h-12 mb-3 opacity-20" />
+                    <p className="text-sm">This folder is empty</p>
+                  </div>
+                )}
             </div>
           )}
         </div>
