@@ -1,6 +1,6 @@
-import { Terminal } from '@xterm/xterm';
-import { FitAddon } from '@xterm/addon-fit';
-import { WebLinksAddon } from '@xterm/addon-web-links';
+import { FitAddon } from "@xterm/addon-fit";
+import { WebLinksAddon } from "@xterm/addon-web-links";
+import { Terminal } from "@xterm/xterm";
 
 interface TerminalOptions {
   element?: HTMLElement | null;
@@ -14,9 +14,9 @@ interface TerminalOptions {
  */
 export const createTerminal = ({
   element = null,
-  initialCommand = '',
+  initialCommand = "",
   cols = 80,
-  rows = 24
+  rows = 24,
 }: TerminalOptions = {}) => {
   // Create the terminal instance
   const terminal = new Terminal({
@@ -24,32 +24,32 @@ export const createTerminal = ({
     fontSize: 14,
     lineHeight: 1.4,
     cursorBlink: true,
-    cursorStyle: 'block',
+    cursorStyle: "block",
     theme: {
-      background: '#1a1a1a',
-      foreground: '#f0f0f0',
-      black: '#000000',
-      red: '#e06c75',
-      green: '#98c379',
-      yellow: '#e5c07b',
-      blue: '#61afef',
-      magenta: '#c678dd',
-      cyan: '#56b6c2',
-      white: '#d0d0d0',
-      brightBlack: '#5c6370',
-      brightRed: '#e06c75',
-      brightGreen: '#98c379',
-      brightYellow: '#e5c07b',
-      brightBlue: '#61afef',
-      brightMagenta: '#c678dd',
-      brightCyan: '#56b6c2',
-      brightWhite: '#ffffff',
+      background: "#1a1a1a",
+      foreground: "#f0f0f0",
+      black: "#000000",
+      red: "#e06c75",
+      green: "#98c379",
+      yellow: "#e5c07b",
+      blue: "#61afef",
+      magenta: "#c678dd",
+      cyan: "#56b6c2",
+      white: "#d0d0d0",
+      brightBlack: "#5c6370",
+      brightRed: "#e06c75",
+      brightGreen: "#98c379",
+      brightYellow: "#e5c07b",
+      brightBlue: "#61afef",
+      brightMagenta: "#c678dd",
+      brightCyan: "#56b6c2",
+      brightWhite: "#ffffff",
     },
     allowTransparency: true,
     convertEol: true,
     scrollback: 1000,
     cols,
-    rows
+    rows,
   });
 
   // Add fit addon for resizing
@@ -68,7 +68,7 @@ export const createTerminal = ({
       try {
         fitAddon.fit();
       } catch (e) {
-        console.warn('Error fitting terminal:', e);
+        console.warn("Error fitting terminal:", e);
       }
     }, 100);
   }
@@ -82,11 +82,11 @@ export const createTerminal = ({
 
     try {
       // Make sure the renderer is initialized before attempting to fit
-      if ((terminal as any)._core && (terminal as any)._core._renderService) {
+      if ((terminal as any)._core?._renderService) {
         fitAddon.fit();
       }
     } catch (e) {
-      console.warn('Error resizing terminal:', e);
+      console.warn("Error resizing terminal:", e);
     }
   };
 
@@ -117,7 +117,7 @@ export const createTerminal = ({
     try {
       terminal.dispose();
     } catch (error) {
-      console.error('Error disposing terminal:', error);
+      console.error("Error disposing terminal:", error);
     }
   };
 
@@ -136,16 +136,19 @@ export function runMatrixEffect(terminal: Terminal): () => void {
   // Create matrix data structure
   const matrix: number[] = new Array(cols).fill(0);
   const characters: string[][] = Array.from({ length: cols }, () =>
-    Array.from({ length: rows }, () => ' '));
+    Array.from({ length: rows }, () => " "),
+  );
   const brightness: number[][] = Array.from({ length: cols }, () =>
-    Array.from({ length: rows }, () => 0));
+    Array.from({ length: rows }, () => 0),
+  );
 
   // Animation frame ID for cleanup
   let animationFrameId: number | ReturnType<typeof setTimeout>;
 
   // Random characters for matrix effect
   const getRandomChar = () => {
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%\"'#&_(),.;:?!\\|{}<>[]^~";
+    const chars =
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%\"'#&_(),.;:?!\\|{}<>[]^~";
     return chars.charAt(Math.floor(Math.random() * chars.length));
   };
 
@@ -166,7 +169,7 @@ export function runMatrixEffect(terminal: Terminal): () => void {
             brightness[i][j] -= 0.08; // Increased fade rate from 0.05 to 0.1
             if (brightness[i][j] <= 0) {
               brightness[i][j] = 0;
-              characters[i][j] = ' ';
+              characters[i][j] = " ";
             }
           }
         }
@@ -204,7 +207,7 @@ export function runMatrixEffect(terminal: Terminal): () => void {
 
     for (let j = 0; j < rows; j++) {
       for (let i = 0; i < cols; i++) {
-        if (characters[i][j] !== ' ' && brightness[i][j] > 0) {
+        if (characters[i][j] !== " " && brightness[i][j] > 0) {
           // Calculate color based on brightness
           const b = brightness[i][j];
           if (b > 0.8) {
@@ -221,11 +224,11 @@ export function runMatrixEffect(terminal: Terminal): () => void {
             terminal.write(`\x1b[2;32m${characters[i][j]}\x1b[0m`);
           }
         } else {
-          terminal.write(' ');
+          terminal.write(" ");
         }
       }
       if (j < rows - 1) {
-        terminal.write('\r\n');
+        terminal.write("\r\n");
       }
     }
   };

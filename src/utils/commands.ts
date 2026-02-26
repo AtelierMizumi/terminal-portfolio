@@ -1,4 +1,4 @@
-import { Terminal } from "@xterm/xterm";
+import type { Terminal } from "@xterm/xterm";
 import { runMatrixEffect } from "./terminal";
 
 // Track active effects for cleanup
@@ -7,23 +7,20 @@ let activeMatrixEffect: (() => void) | null = null;
 // Function to get system information
 const getSystemInfo = () => {
   return {
-    user: 'thuanc177@cachyos',
-    os: 'CachyOS x86_64',
-    host: 'Nitro AN515-58',
-    kernel: 'Linux 6.14.4-2-cachyos',
-    uptime: '3 hours, 8 mins',
-    packages: '1979 (pacman)',
-    shell: 'fish 4.0.2',
-    displays: [
-      '1920x1080 @ 100Hz [External]',
-      '1920x1080 @ 144Hz [Built-in]'
-    ],
-    de: 'KDE Plasma 6.3.4',
-    wm: 'KWin (Wayland)',
-    cpu: 'i5-12500H (16) @ 4.50 GHz',
-    gpu: 'NVIDIA RTX 3050 Mobile / Intel Iris Xe',
-    memory: '13.79 GiB / 31.05 GiB (44%)',
-    locale: 'en_US.UTF-8'
+    user: "thuanc177@cachyos",
+    os: "CachyOS x86_64",
+    host: "Nitro AN515-58",
+    kernel: "Linux 6.14.4-2-cachyos",
+    uptime: "3 hours, 8 mins",
+    packages: "1979 (pacman)",
+    shell: "fish 4.0.2",
+    displays: ["1920x1080 @ 100Hz [External]", "1920x1080 @ 144Hz [Built-in]"],
+    de: "KDE Plasma 6.3.4",
+    wm: "KWin (Wayland)",
+    cpu: "i5-12500H (16) @ 4.50 GHz",
+    gpu: "NVIDIA RTX 3050 Mobile / Intel Iris Xe",
+    memory: "13.79 GiB / 31.05 GiB (44%)",
+    locale: "en_US.UTF-8",
   };
 };
 
@@ -34,31 +31,81 @@ interface Commands {
 
 export const commands: Commands = {
   help: async (terminal: Terminal) => {
-    terminal.writeln("\x1b[1;36m╔════════════════════════════════════════════╗\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m   \x1b[1;37mAvailable Commands\x1b[0m                       \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m╠════════════════════════════════════════════╣\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;33mhelp\x1b[0m       Show this help message          \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;33mclear\x1b[0m      Clear the terminal               \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;33mecho\x1b[0m       Print text to the terminal       \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;33mls\x1b[0m         List files and directories       \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;33mcat\x1b[0m        Show content of a file           \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;33mabout\x1b[0m      About me                        \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;33mprojects\x1b[0m   List my projects                \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;33mskills\x1b[0m     List my skills                  \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;33mcontact\x1b[0m    Show my contact information     \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;33mcmatrix\x1b[0m    Run matrix effect               \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;33mfastfetch\x1b[0m  Display system information      \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;33mneofetch\x1b[0m   Alias for fastfetch             \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;33mopen\x1b[0m       Open an app (music, games)      \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;33mhistory\x1b[0m    Show command history             \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;33mdate\x1b[0m       Show current date and time      \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;33mwhoami\x1b[0m     Show current user               \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;33muname\x1b[0m      System information              \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m                                             \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;35mEaster Eggs\x1b[0m                                \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;33mcoffee\x1b[0m     Spawn a cup of coffee           \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m║\x1b[0m  \x1b[1;33mrain\x1b[0m       Toggle rain effect              \x1b[1;36m║\x1b[0m");
-    terminal.writeln("\x1b[1;36m╚════════════════════════════════════════════╝\x1b[0m");
+    terminal.writeln(
+      "\x1b[1;36m╔════════════════════════════════════════════╗\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m   \x1b[1;37mAvailable Commands\x1b[0m                       \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m╠════════════════════════════════════════════╣\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33mhelp\x1b[0m       Show this help message          \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33mclear\x1b[0m      Clear the terminal               \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33mecho\x1b[0m       Print text to the terminal       \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33mls\x1b[0m         List files and directories       \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33mcat\x1b[0m        Show content of a file           \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33mabout\x1b[0m      About me                        \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33mprojects\x1b[0m   List my projects                \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33mskills\x1b[0m     List my skills                  \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33mcontact\x1b[0m    Show my contact information     \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33mcmatrix\x1b[0m    Run matrix effect               \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33mfastfetch\x1b[0m  Display system information      \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33mneofetch\x1b[0m   Alias for fastfetch             \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33mopen\x1b[0m       Open app (music, games, files)  \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33mhistory\x1b[0m    Show command history             \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33mdate\x1b[0m       Show current date and time      \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33mwhoami\x1b[0m     Show current user               \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33muname\x1b[0m      System information              \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m                                             \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;35mEaster Eggs\x1b[0m                                \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33mcoffee\x1b[0m     Spawn a cup of coffee           \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m║\x1b[0m  \x1b[1;33mrain\x1b[0m       Toggle rain effect              \x1b[1;36m║\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;36m╚════════════════════════════════════════════╝\x1b[0m",
+    );
   },
 
   clear: async (terminal: Terminal) => {
@@ -70,8 +117,12 @@ export const commands: Commands = {
   },
 
   ls: async (terminal: Terminal) => {
-    terminal.writeln("\x1b[1;34mprojects\x1b[0m  \x1b[1;34mdocs\x1b[0m  \x1b[1;34mskills\x1b[0m  \x1b[1;34m.config\x1b[0m");
-    terminal.writeln("\x1b[1;32mabout.txt\x1b[0m  \x1b[1;32mcontact.txt\x1b[0m  \x1b[1;32mresume.pdf\x1b[0m  \x1b[1;32mREADME.md\x1b[0m");
+    terminal.writeln(
+      "\x1b[1;34mprojects\x1b[0m  \x1b[1;34mdocs\x1b[0m  \x1b[1;34mskills\x1b[0m  \x1b[1;34m.config\x1b[0m",
+    );
+    terminal.writeln(
+      "\x1b[1;32mabout.txt\x1b[0m  \x1b[1;32mcontact.txt\x1b[0m  \x1b[1;32mresume.pdf\x1b[0m  \x1b[1;32mREADME.md\x1b[0m",
+    );
   },
 
   cat: async (terminal: Terminal, args: string[] = []) => {
@@ -84,13 +135,21 @@ export const commands: Commands = {
     switch (filename) {
       case "about.txt":
         terminal.writeln("");
-        terminal.writeln("\x1b[1;36m  ┌──────────────────────────────────────┐\x1b[0m");
-        terminal.writeln("\x1b[1;36m  │\x1b[0m  \x1b[1;37mHi! I'm thuanc177 (AtelierMizumi)\x1b[0m \x1b[1;36m│\x1b[0m");
-        terminal.writeln("\x1b[1;36m  └──────────────────────────────────────┘\x1b[0m");
+        terminal.writeln(
+          "\x1b[1;36m  ┌──────────────────────────────────────┐\x1b[0m",
+        );
+        terminal.writeln(
+          "\x1b[1;36m  │\x1b[0m  \x1b[1;37mHi! I'm thuanc177 (AtelierMizumi)\x1b[0m \x1b[1;36m│\x1b[0m",
+        );
+        terminal.writeln(
+          "\x1b[1;36m  └──────────────────────────────────────┘\x1b[0m",
+        );
         terminal.writeln("");
         terminal.writeln("  A Computer Science student at VKU, Vietnam.");
         terminal.writeln("  Passionate about Linux ricing, custom keyboards,");
-        terminal.writeln("  embedded systems (ZMK firmware), and web development.");
+        terminal.writeln(
+          "  embedded systems (ZMK firmware), and web development.",
+        );
         terminal.writeln("");
         terminal.writeln("  \x1b[1;33m🏔️\x1b[0m  Arch Linux / CachyOS user");
         terminal.writeln("  \x1b[1;33m⌨️\x1b[0m  Custom keyboard enthusiast");
@@ -103,15 +162,23 @@ export const commands: Commands = {
         terminal.writeln("  \x1b[1;36mContact Information:\x1b[0m");
         terminal.writeln("  ─────────────────────────────");
         terminal.writeln("  \x1b[1;33mEmail:\x1b[0m    contact@thuanc177.me");
-        terminal.writeln("  \x1b[1;33mGitHub:\x1b[0m   github.com/AtelierMizumi");
-        terminal.writeln("  \x1b[1;33mBlog:\x1b[0m     ateliermizumi.github.io");
+        terminal.writeln(
+          "  \x1b[1;33mGitHub:\x1b[0m   github.com/AtelierMizumi",
+        );
+        terminal.writeln(
+          "  \x1b[1;33mBlog:\x1b[0m     ateliermizumi.github.io",
+        );
         terminal.writeln("");
         break;
       case "readme.md":
         terminal.writeln("");
         terminal.writeln("  \x1b[1;37m# Terminal Portfolio\x1b[0m");
-        terminal.writeln("  A virtual desktop portfolio inspired by Linux ricing & MiSide.");
-        terminal.writeln("  Built with Next.js, TypeScript, TailwindCSS, and xterm.js.");
+        terminal.writeln(
+          "  A virtual desktop portfolio inspired by Linux ricing & MiSide.",
+        );
+        terminal.writeln(
+          "  Built with Next.js, TypeScript, TailwindCSS, and xterm.js.",
+        );
         terminal.writeln("");
         terminal.writeln("  Type `help` to see all available commands.");
         terminal.writeln("");
@@ -131,9 +198,15 @@ export const commands: Commands = {
     terminal.writeln("\x1b[1;36m  My Projects\x1b[0m");
     terminal.writeln("  ═══════════════════════════════════════════════");
     terminal.writeln("");
-    terminal.writeln("  \x1b[1;33m1. Terminal Portfolio\x1b[0m \x1b[32m[active]\x1b[0m");
-    terminal.writeln("     Virtual desktop portfolio with Linux rice aesthetics");
-    terminal.writeln("     \x1b[90mNext.js • TypeScript • TailwindCSS • xterm.js\x1b[0m");
+    terminal.writeln(
+      "  \x1b[1;33m1. Terminal Portfolio\x1b[0m \x1b[32m[active]\x1b[0m",
+    );
+    terminal.writeln(
+      "     Virtual desktop portfolio with Linux rice aesthetics",
+    );
+    terminal.writeln(
+      "     \x1b[90mNext.js • TypeScript • TailwindCSS • xterm.js\x1b[0m",
+    );
     terminal.writeln("");
     terminal.writeln("  \x1b[1;33m2. Personal Blog\x1b[0m");
     terminal.writeln("     Technical blog powered by Jekyll + Chirpy theme");
@@ -160,7 +233,9 @@ export const commands: Commands = {
     terminal.writeln("  ═══════════════════════════════════════════════");
     terminal.writeln("");
     terminal.writeln("  \x1b[1;33mLanguages:\x1b[0m");
-    terminal.writeln("    TypeScript • JavaScript • Python • C/C++ • Nix • Rust");
+    terminal.writeln(
+      "    TypeScript • JavaScript • Python • C/C++ • Nix • Rust",
+    );
     terminal.writeln("");
     terminal.writeln("  \x1b[1;33mFrontend:\x1b[0m");
     terminal.writeln("    React • Next.js • TailwindCSS • HTML/CSS");
@@ -215,22 +290,54 @@ export const commands: Commands = {
     terminal.clear();
 
     terminal.writeln("");
-    terminal.writeln("\x1b[36m           .-------------------------:\x1b[0m                    \x1b[1;32m" + info.user + "\x1b[0m");
-    terminal.writeln("\x1b[36m          .+=========================.\x1b[0m                    \x1b[1;37m-----------------\x1b[0m");
-    terminal.writeln("\x1b[36m         :++===++==================-\x1b[0m       \x1b[36m:++-\x1b[0m           \x1b[1;37mOS:\x1b[0m " + info.os);
-    terminal.writeln("\x1b[36m        :*++====+++++=============-\x1b[0m        \x1b[36m.==:\x1b[0m           \x1b[1;37mHost:\x1b[0m " + info.host);
-    terminal.writeln("\x1b[36m       -*+++=====+***++==========:\x1b[0m                        \x1b[1;37mKernel:\x1b[0m " + info.kernel);
-    terminal.writeln("\x1b[36m      =*++++========------------:\x1b[0m                         \x1b[1;37mUptime:\x1b[0m " + info.uptime);
-    terminal.writeln("\x1b[36m     =*+++++=====-\x1b[0m                     \x1b[36m...\x1b[0m                \x1b[1;37mPackages:\x1b[0m " + info.packages);
-    terminal.writeln("\x1b[36m   .+*+++++=-===:\x1b[0m                    \x1b[36m.=+++=:\x1b[0m              \x1b[1;37mShell:\x1b[0m " + info.shell);
-    terminal.writeln("\x1b[36m  :++++=====-==:\x1b[0m                     \x1b[36m-*****+\x1b[0m              \x1b[1;37mDisplay 1:\x1b[0m " + info.displays[0]);
-    terminal.writeln("\x1b[36m :++========-=.\x1b[0m                      \x1b[36m.=+**+.\x1b[0m              \x1b[1;37mDisplay 2:\x1b[0m " + info.displays[1]);
-    terminal.writeln("\x1b[36m.+===========-.x1b[0m                          \x1b[36m.\x1b[0m                 \x1b[1;37mDE:\x1b[0m " + info.de);
-    terminal.writeln("\x1b[36m :+++++++====-\x1b[0m                                \x1b[36m.--==-.     \x1b[0m \x1b[1;37mWM:\x1b[0m " + info.wm);
-    terminal.writeln("\x1b[36m  :++==========.\x1b[0m                             \x1b[36m:+++++++:\x1b[0m    \x1b[1;37mCPU:\x1b[0m " + info.cpu);
-    terminal.writeln("\x1b[36m   .-===========.\x1b[0m                            \x1b[36m=*****+*+\x1b[0m    \x1b[1;37mGPU:\x1b[0m " + info.gpu);
-    terminal.writeln("\x1b[36m    .-===========:\x1b[0m                           \x1b[36m.+*****+:\x1b[0m    \x1b[1;37mMemory:\x1b[0m " + info.memory);
-    terminal.writeln("\x1b[36m      -=======++++:::::::::::::::::::::::::-:  .---:\x1b[0m      \x1b[1;37mLocale:\x1b[0m " + info.locale);
+    terminal.writeln(
+      `\x1b[36m           .-------------------------:\x1b[0m                    \x1b[1;32m${info.user}\x1b[0m`,
+    );
+    terminal.writeln(
+      "\x1b[36m          .+=========================.\x1b[0m                    \x1b[1;37m-----------------\x1b[0m",
+    );
+    terminal.writeln(
+      `\x1b[36m         :++===++==================-\x1b[0m       \x1b[36m:++-\x1b[0m           \x1b[1;37mOS:\x1b[0m ${info.os}`,
+    );
+    terminal.writeln(
+      `\x1b[36m        :*++====+++++=============-\x1b[0m        \x1b[36m.==:\x1b[0m           \x1b[1;37mHost:\x1b[0m ${info.host}`,
+    );
+    terminal.writeln(
+      `\x1b[36m       -*+++=====+***++==========:\x1b[0m                        \x1b[1;37mKernel:\x1b[0m ${info.kernel}`,
+    );
+    terminal.writeln(
+      `\x1b[36m      =*++++========------------:\x1b[0m                         \x1b[1;37mUptime:\x1b[0m ${info.uptime}`,
+    );
+    terminal.writeln(
+      `\x1b[36m     =*+++++=====-\x1b[0m                     \x1b[36m...\x1b[0m                \x1b[1;37mPackages:\x1b[0m ${info.packages}`,
+    );
+    terminal.writeln(
+      `\x1b[36m   .+*+++++=-===:\x1b[0m                    \x1b[36m.=+++=:\x1b[0m              \x1b[1;37mShell:\x1b[0m ${info.shell}`,
+    );
+    terminal.writeln(
+      `\x1b[36m  :++++=====-==:\x1b[0m                     \x1b[36m-*****+\x1b[0m              \x1b[1;37mDisplay 1:\x1b[0m ${info.displays[0]}`,
+    );
+    terminal.writeln(
+      `\x1b[36m :++========-=.\x1b[0m                      \x1b[36m.=+**+.\x1b[0m              \x1b[1;37mDisplay 2:\x1b[0m ${info.displays[1]}`,
+    );
+    terminal.writeln(
+      `\x1b[36m.+===========-.x1b[0m                          \x1b[36m.\x1b[0m                 \x1b[1;37mDE:\x1b[0m ${info.de}`,
+    );
+    terminal.writeln(
+      `\x1b[36m :+++++++====-\x1b[0m                                \x1b[36m.--==-.     \x1b[0m \x1b[1;37mWM:\x1b[0m ${info.wm}`,
+    );
+    terminal.writeln(
+      `\x1b[36m  :++==========.\x1b[0m                             \x1b[36m:+++++++:\x1b[0m    \x1b[1;37mCPU:\x1b[0m ${info.cpu}`,
+    );
+    terminal.writeln(
+      `\x1b[36m   .-===========.\x1b[0m                            \x1b[36m=*****+*+\x1b[0m    \x1b[1;37mGPU:\x1b[0m ${info.gpu}`,
+    );
+    terminal.writeln(
+      `\x1b[36m    .-===========:\x1b[0m                           \x1b[36m.+*****+:\x1b[0m    \x1b[1;37mMemory:\x1b[0m ${info.memory}`,
+    );
+    terminal.writeln(
+      `\x1b[36m      -=======++++:::::::::::::::::::::::::-:  .---:\x1b[0m      \x1b[1;37mLocale:\x1b[0m ${info.locale}`,
+    );
     terminal.writeln("");
     terminal.writeln("");
   },
@@ -244,7 +351,7 @@ export const commands: Commands = {
   open: async (terminal: Terminal, args: string[] = []) => {
     if (args.length === 0) {
       terminal.writeln("Usage: open <app>");
-      terminal.writeln("Available apps: music, games, about, resume");
+      terminal.writeln("Available apps: music, games, about, resume, files");
       return;
     }
 
@@ -253,23 +360,37 @@ export const commands: Commands = {
       case "music":
         terminal.writeln("Opening Music Player...");
         // Dispatch custom event to open music player
-        window.dispatchEvent(new CustomEvent('terminal-open-app', { detail: { app: 'music' } }));
+        window.dispatchEvent(
+          new CustomEvent("terminal-open-app", { detail: { app: "music" } }),
+        );
         break;
       case "games":
         terminal.writeln("Opening Games Explorer...");
-        window.dispatchEvent(new CustomEvent('terminal-open-app', { detail: { app: 'games' } }));
+        window.dispatchEvent(
+          new CustomEvent("terminal-open-app", { detail: { app: "games" } }),
+        );
         break;
       case "about":
         terminal.writeln("Opening About window...");
-        window.dispatchEvent(new CustomEvent('terminal-open-app', { detail: { app: 'about' } }));
+        window.dispatchEvent(
+          new CustomEvent("terminal-open-app", { detail: { app: "about" } }),
+        );
         break;
       case "resume":
         terminal.writeln("Opening Resume...");
-        window.dispatchEvent(new CustomEvent('terminal-open-app', { detail: { app: 'resume' } }));
+        window.dispatchEvent(
+          new CustomEvent("terminal-open-app", { detail: { app: "resume" } }),
+        );
+        break;
+      case "files":
+        terminal.writeln("Opening File Manager...");
+        window.dispatchEvent(
+          new CustomEvent("terminal-open-app", { detail: { app: "files" } }),
+        );
         break;
       default:
         terminal.writeln(`Unknown app: ${app}`);
-        terminal.writeln("Available apps: music, games, about, resume");
+        terminal.writeln("Available apps: music, games, about, resume, files");
     }
   },
 
@@ -302,11 +423,15 @@ export const commands: Commands = {
   // Easter Eggs
   coffee: async (terminal: Terminal) => {
     terminal.writeln("\r\n  \x1b[1;33mEnjoy your coffee! ☕\x1b[0m");
-    window.dispatchEvent(new CustomEvent('terminal-easter-egg', { detail: { type: 'coffee' } }));
+    window.dispatchEvent(
+      new CustomEvent("terminal-easter-egg", { detail: { type: "coffee" } }),
+    );
   },
 
   rain: async (terminal: Terminal) => {
     terminal.writeln("\r\n  \x1b[1;34mIt's starting to rain... 🌧️\x1b[0m");
-    window.dispatchEvent(new CustomEvent('terminal-easter-egg', { detail: { type: 'rain' } }));
+    window.dispatchEvent(
+      new CustomEvent("terminal-easter-egg", { detail: { type: "rain" } }),
+    );
   },
 };

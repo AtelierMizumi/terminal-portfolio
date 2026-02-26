@@ -1,23 +1,29 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
-import { Terminal as XTerminal } from '@xterm/xterm';
-import { FitAddon } from '@xterm/addon-fit';
-import { WebLinksAddon } from '@xterm/addon-web-links';
-import '@xterm/xterm/css/xterm.css';
-import { commands } from '@/utils/commands';
+import { FitAddon } from "@xterm/addon-fit";
+import { WebLinksAddon } from "@xterm/addon-web-links";
+import { Terminal as XTerminal } from "@xterm/xterm";
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
+import "@xterm/xterm/css/xterm.css";
+import { useAchievements } from "@/contexts/AchievementContext";
+import { commands } from "@/utils/commands";
 
 interface TerminalProps {
   className?: string;
 }
 
-const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
+const Terminal: React.FC<TerminalProps> = ({ className = "" }) => {
   const terminalRef = useRef<HTMLDivElement>(null);
   const terminalInstanceRef = useRef<any>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
   const [terminalReady, setTerminalReady] = useState(false);
   const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isResizingRef = useRef<boolean>(false);
+
+  // Achievement tracking
+  const { unlockAchievement } = useAchievements();
+  const commandCountRef = useRef(0);
 
   useEffect(() => {
     if (!terminalRef.current) return;
@@ -28,26 +34,26 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
       fontSize: 14,
       lineHeight: 1.2,
       cursorBlink: true,
-      cursorStyle: 'block',
+      cursorStyle: "block",
       theme: {
-        background: 'transparent',
-        foreground: '#f0f0f0',
-        black: '#000000',
-        red: '#e06c75',
-        green: '#98c379',
-        yellow: '#e5c07b',
-        blue: '#61afef',
-        magenta: '#c678dd',
-        cyan: '#56b6c2',
-        white: '#d0d0d0',
-        brightBlack: '#5c6370',
-        brightRed: '#e06c75',
-        brightGreen: '#98c379',
-        brightYellow: '#e5c07b',
-        brightBlue: '#61afef',
-        brightMagenta: '#c678dd',
-        brightCyan: '#56b6c2',
-        brightWhite: '#ffffff',
+        background: "transparent",
+        foreground: "#f0f0f0",
+        black: "#000000",
+        red: "#e06c75",
+        green: "#98c379",
+        yellow: "#e5c07b",
+        blue: "#61afef",
+        magenta: "#c678dd",
+        cyan: "#56b6c2",
+        white: "#d0d0d0",
+        brightBlack: "#5c6370",
+        brightRed: "#e06c75",
+        brightGreen: "#98c379",
+        brightYellow: "#e5c07b",
+        brightBlue: "#61afef",
+        brightMagenta: "#c678dd",
+        brightCyan: "#56b6c2",
+        brightWhite: "#ffffff",
       },
       allowTransparency: true,
       scrollback: 1000,
@@ -71,17 +77,21 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
         try {
           terminal.dispose();
         } catch (e) {
-          console.error('Error disposing terminal:', e);
+          console.error("Error disposing terminal:", e);
         }
-      }
+      },
     };
 
     // Allow terminal to fully initialize before writing to it
     setTimeout(() => {
       // Set some initial text
-      terminal.write('\x1b[1;32m$ Welcomes to my cozy place!\x1b[0m\r\n');
-      terminal.write('\x1b[1;37mType "help" to see available commands.\x1b[0m\r\n\r\n');
-      terminal.write('\x1b[1;32muser@portfolio\x1b[0m:\x1b[1;34m~\x1b[1;32m$\x1b[0m ');
+      terminal.write("\x1b[1;32m$ Welcomes to my cozy place!\x1b[0m\r\n");
+      terminal.write(
+        '\x1b[1;37mType "help" to see available commands.\x1b[0m\r\n\r\n',
+      );
+      terminal.write(
+        "\x1b[1;32muser@portfolio\x1b[0m:\x1b[1;34m~\x1b[1;32m$\x1b[0m ",
+      );
 
       // Set terminal ready state
       setTerminalReady(true);
@@ -102,17 +112,17 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
             fitAddon.fit();
             terminal.scrollToBottom();
           } catch (e) {
-            console.error('Error fitting terminal:', e);
+            console.error("Error fitting terminal:", e);
           }
         }
       }, 150); // Slightly longer debounce to ensure window has settled
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     // Set up command handling
-    let currentLine = '';
-    let commandHistory: string[] = [];
+    let currentLine = "";
+    const commandHistory: string[] = [];
     let historyIndex = 0;
 
     terminal.onKey(({ key, domEvent }) => {
@@ -120,7 +130,7 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
 
       // Handle Enter key
       if (charCode === 13) {
-        terminal.write('\r\n');
+        terminal.write("\r\n");
 
         // Process command
         if (currentLine.trim()) {
@@ -131,12 +141,14 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
           // Process command
           processCommand(currentLine, terminal, commandHistory);
         } else {
-          terminal.write('\x1b[1;32muser@portfolio\x1b[0m:\x1b[1;34m~\x1b[1;32m$\x1b[0m ');
+          terminal.write(
+            "\x1b[1;32muser@portfolio\x1b[0m:\x1b[1;34m~\x1b[1;32m$\x1b[0m ",
+          );
         }
 
         // Reset current line
 
-        currentLine = '';
+        currentLine = "";
 
         // Ensure terminal scrolls to the bottom after command execution
         setTimeout(() => terminal.scrollToBottom(), 10);
@@ -145,7 +157,7 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
       else if (charCode === 8) {
         if (currentLine.length > 0) {
           currentLine = currentLine.substring(0, currentLine.length - 1);
-          terminal.write('\b \b'); // Move back, clear character, move back again
+          terminal.write("\b \b"); // Move back, clear character, move back again
         }
       }
       // Handle Up Arrow - command history
@@ -154,7 +166,7 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
           historyIndex--;
           // Clear current line
           while (currentLine.length > 0) {
-            terminal.write('\b \b');
+            terminal.write("\b \b");
             currentLine = currentLine.substring(0, currentLine.length - 1);
           }
           // Write history item
@@ -168,7 +180,7 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
           historyIndex++;
           // Clear current line
           while (currentLine.length > 0) {
-            terminal.write('\b \b');
+            terminal.write("\b \b");
             currentLine = currentLine.substring(0, currentLine.length - 1);
           }
           // Write history item
@@ -178,38 +190,42 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
           historyIndex++;
           // Clear current line
           while (currentLine.length > 0) {
-            terminal.write('\b \b');
+            terminal.write("\b \b");
             currentLine = currentLine.substring(0, currentLine.length - 1);
           }
-          currentLine = '';
+          currentLine = "";
         }
       }
       // Handle Tab - Autocompletion
       else if (charCode === 9) {
         if (currentLine.length > 0) {
-          const parts = currentLine.split(' ');
+          const parts = currentLine.split(" ");
           if (parts.length === 1) {
             const cmdToComplete = parts[0].toLowerCase();
-            const availableCommands = Object.keys(commands).concat(['history']);
-            const matches = availableCommands.filter(c => c.startsWith(cmdToComplete));
+            const availableCommands = Object.keys(commands).concat(["history"]);
+            const matches = availableCommands.filter((c) =>
+              c.startsWith(cmdToComplete),
+            );
 
             if (matches.length === 1) {
               // Found exact match
               const match = matches[0];
               const toAdd = match.substring(cmdToComplete.length);
-              currentLine += toAdd + ' ';
-              terminal.write(toAdd + ' ');
+              currentLine += `${toAdd} `;
+              terminal.write(`${toAdd} `);
             } else if (matches.length > 1) {
               // Found multiple matches, show them
-              terminal.writeln('');
-              terminal.writeln('\x1b[1;36m' + matches.join('  ') + '\x1b[0m');
-              terminal.write('\x1b[1;32muser@portfolio\x1b[0m:\x1b[1;34m~\x1b[1;32m$\x1b[0m ' + currentLine);
+              terminal.writeln("");
+              terminal.writeln(`\x1b[1;36m${matches.join("  ")}\x1b[0m`);
+              terminal.write(
+                `\x1b[1;32muser@portfolio\x1b[0m:\x1b[1;34m~\x1b[1;32m$\x1b[0m ${currentLine}`,
+              );
             }
-          } else if (parts[0].toLowerCase() === 'cat') {
+          } else if (parts[0].toLowerCase() === "cat") {
             // Rudimentary completion for cat command
             const fileToComplete = parts[1].toLowerCase();
-            const files = ['about.txt', 'contact.txt', 'readme.md'];
-            const matches = files.filter(f => f.startsWith(fileToComplete));
+            const files = ["about.txt", "contact.txt", "readme.md"];
+            const matches = files.filter((f) => f.startsWith(fileToComplete));
 
             if (matches.length === 1) {
               const match = matches[0];
@@ -217,15 +233,17 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
               currentLine += toAdd;
               terminal.write(toAdd);
             } else if (matches.length > 1) {
-              terminal.writeln('');
-              terminal.writeln('\x1b[1;32m' + matches.join('  ') + '\x1b[0m');
-              terminal.write('\x1b[1;32muser@portfolio\x1b[0m:\x1b[1;34m~\x1b[1;32m$\x1b[0m ' + currentLine);
+              terminal.writeln("");
+              terminal.writeln(`\x1b[1;32m${matches.join("  ")}\x1b[0m`);
+              terminal.write(
+                `\x1b[1;32muser@portfolio\x1b[0m:\x1b[1;34m~\x1b[1;32m$\x1b[0m ${currentLine}`,
+              );
             }
-          } else if (parts[0].toLowerCase() === 'open') {
+          } else if (parts[0].toLowerCase() === "open") {
             // Completion for open command
             const appToComplete = parts[1].toLowerCase();
-            const apps = ['music', 'games', 'about', 'resume'];
-            const matches = apps.filter(a => a.startsWith(appToComplete));
+            const apps = ["music", "games", "about", "resume", "files"];
+            const matches = apps.filter((a) => a.startsWith(appToComplete));
 
             if (matches.length === 1) {
               const match = matches[0];
@@ -233,9 +251,11 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
               currentLine += toAdd;
               terminal.write(toAdd);
             } else if (matches.length > 1) {
-              terminal.writeln('');
-              terminal.writeln('\x1b[1;34m' + matches.join('  ') + '\x1b[0m');
-              terminal.write('\x1b[1;32muser@portfolio\x1b[0m:\x1b[1;34m~\x1b[1;32m$\x1b[0m ' + currentLine);
+              terminal.writeln("");
+              terminal.writeln(`\x1b[1;34m${matches.join("  ")}\x1b[0m`);
+              terminal.write(
+                `\x1b[1;32muser@portfolio\x1b[0m:\x1b[1;34m~\x1b[1;32m$\x1b[0m ${currentLine}`,
+              );
             }
           }
         }
@@ -249,7 +269,7 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
 
     // Clean up on unmount
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
       }
@@ -260,13 +280,25 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
   }, []);
 
   // Custom command handler implementation
-  const processCommand = async (command: string, terminal: XTerminal, history: string[]) => {
-    const parts = command.trim().split(' ');
+  const processCommand = async (
+    command: string,
+    terminal: XTerminal,
+    history: string[],
+  ) => {
+    const parts = command.trim().split(" ");
     const cmd = parts[0].toLowerCase();
     const args = parts.slice(1);
 
-    if (cmd === 'history') {
-      terminal.writeln('');
+    // Check explorer achievement
+    if (cmd !== "") {
+      commandCountRef.current += 1;
+      if (commandCountRef.current >= 10) {
+        unlockAchievement("explorer");
+      }
+    }
+
+    if (cmd === "history") {
+      terminal.writeln("");
       history.forEach((h, i) => {
         terminal.writeln(`  ${i + 1}  ${h}`);
       });
@@ -274,10 +306,12 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
       try {
         await commands[cmd](terminal, args);
       } catch (err: any) {
-        terminal.writeln(`\r\n\x1b[1;31mError: ${err.message || 'Unknown error during execution'}\x1b[0m`);
+        terminal.writeln(
+          `\r\n\x1b[1;31mError: ${err.message || "Unknown error during execution"}\x1b[0m`,
+        );
         console.error("Command error:", err);
       }
-    } else if (cmd === '') {
+    } else if (cmd === "") {
       // Do nothing for empty command
     } else {
       terminal.writeln(`\r\nCommand not found: ${cmd}`);
@@ -285,7 +319,9 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
     }
 
     // Always show prompt after command execution
-    terminal.write('\r\n\x1b[1;32muser@portfolio\x1b[0m:\x1b[1;34m~\x1b[1;32m$\x1b[0m ');
+    terminal.write(
+      "\r\n\x1b[1;32muser@portfolio\x1b[0m:\x1b[1;34m~\x1b[1;32m$\x1b[0m ",
+    );
   };
 
   // Handle ResizeObserver with better debouncing
@@ -305,7 +341,7 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
               terminalInstanceRef.current.terminal.scrollToBottom();
             }
           } catch (e) {
-            console.error('Error during resize:', e);
+            console.error("Error during resize:", e);
           }
         }
       }, 150); // Slightly longer delay to let resize settle
@@ -341,26 +377,28 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
               terminalInstanceRef.current.terminal.scrollToBottom();
             }
           } catch (e) {
-            console.error('Error after resize:', e);
+            console.error("Error after resize:", e);
           }
         }
       }, 200);
     };
 
     // Get any resize handles from parent containers
-    const resizeHandles = document.querySelectorAll('.absolute.bottom-0.right-0.w-4.h-4.cursor-se-resize');
+    const resizeHandles = document.querySelectorAll(
+      ".absolute.bottom-0.right-0.w-4.h-4.cursor-se-resize",
+    );
 
-    resizeHandles.forEach(handle => {
-      handle.addEventListener('mousedown', handleMouseDown);
+    resizeHandles.forEach((handle) => {
+      handle.addEventListener("mousedown", handleMouseDown);
     });
 
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener("mouseup", handleMouseUp);
 
     return () => {
-      resizeHandles.forEach(handle => {
-        handle.removeEventListener('mousedown', handleMouseDown);
+      resizeHandles.forEach((handle) => {
+        handle.removeEventListener("mousedown", handleMouseDown);
       });
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
   }, []);
 
@@ -381,17 +419,20 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
               terminalInstanceRef.current.terminal.scrollToBottom();
             }
           } catch (e) {
-            console.error('Error during terminal resize:', e);
+            console.error("Error during terminal resize:", e);
           }
         }
       }, 100);
     };
 
     // Listen for the custom event from WindowManager
-    document.addEventListener('terminal-resize-end', handleTerminalResizeEnd);
+    document.addEventListener("terminal-resize-end", handleTerminalResizeEnd);
 
     return () => {
-      document.removeEventListener('terminal-resize-end', handleTerminalResizeEnd);
+      document.removeEventListener(
+        "terminal-resize-end",
+        handleTerminalResizeEnd,
+      );
     };
   }, []);
 
@@ -399,7 +440,7 @@ const Terminal: React.FC<TerminalProps> = ({ className = '' }) => {
     <div
       ref={terminalRef}
       className={`terminal-wrapper h-full w-full ${className}`}
-      style={{ overflow: 'hidden', position: 'relative' }}
+      style={{ overflow: "hidden", position: "relative" }}
     />
   );
 };

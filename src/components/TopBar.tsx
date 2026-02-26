@@ -1,27 +1,31 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import {
+  DEMO_SONGS,
+  useAudioVisualizer,
+} from "@/contexts/AudioVisualizerContext";
+import { animate } from "animejs";
+import { format } from "date-fns";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Calendar,
-  Music,
   Image,
+  ImageIcon,
+  Music,
   Paintbrush,
-  Play,
   Pause,
-  SkipForward,
+  Play,
   SkipBack,
-  X,
+  SkipForward,
   Volume2,
   VolumeX,
-  ImageIcon
+  X,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { format } from "date-fns";
-import { useTheme } from "./theme-provider";
-import ColorPalette from './ColorPalette';
-import { animate } from "animejs";
+import type React from "react";
+import { useEffect, useState } from "react";
 import { AudioVisualizer } from "./AudioVisualizer";
-import { useAudioVisualizer, DEMO_SONGS } from "@/contexts/AudioVisualizerContext";
+import ColorPalette from "./ColorPalette";
+import { useTheme } from "./theme-provider";
 
 interface TopBarProps {
   onArchClick?: () => void;
@@ -39,11 +43,11 @@ interface Song {
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
-  onArchClick = () => { },
+  onArchClick = () => {},
   onBackgroundChange,
   onMusicOpen,
   onColorChange,
-  onBackgroundSelectorOpen
+  onBackgroundSelectorOpen,
 }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isMusicPlayerOpen, setIsMusicPlayerOpen] = useState(false);
@@ -63,7 +67,7 @@ export const TopBar: React.FC<TopBarProps> = ({
     nextSong,
     prevSong,
     changeVolume,
-    toggleMute
+    toggleMute,
   } = useAudioVisualizer();
 
   useEffect(() => {
@@ -136,7 +140,11 @@ export const TopBar: React.FC<TopBarProps> = ({
             onClick={onArchClick}
             className="arch-button flex items-center justify-center w-9 h-9 rounded-full bg-blue-500/20 hover:bg-blue-500/40 active:scale-95 backdrop-blur-md transition-all"
           >
-            <img src="/arch-linux.png" alt="Arch Linux" className="w-5 h-5 object-contain" />
+            <img
+              src="/arch-linux.png"
+              alt="Arch Linux"
+              className="w-5 h-5 object-contain"
+            />
           </button>
         </div>
 
@@ -164,9 +172,16 @@ export const TopBar: React.FC<TopBarProps> = ({
             >
               <Music className="w-4 h-4 mr-2" />
               <span className="text-sm mr-2 block truncate max-w-[120px]">
-                {currentSong ? `${currentSong.name} - ${currentSong.artist}` : "Music"}
+                {currentSong
+                  ? `${currentSong.name} - ${currentSong.artist}`
+                  : "Music"}
               </span>
-              <AudioVisualizer type="bars" width={30} height={14} color="#89b4fa" />
+              <AudioVisualizer
+                type="bars"
+                width={30}
+                height={14}
+                color="#89b4fa"
+              />
             </button>
           </div>
         </div>
@@ -218,7 +233,9 @@ export const TopBar: React.FC<TopBarProps> = ({
                   {currentSong ? (
                     <>
                       <h4 className="font-medium">{currentSong.name}</h4>
-                      <p className="text-gray-400 text-sm">{currentSong.artist}</p>
+                      <p className="text-gray-400 text-sm">
+                        {currentSong.artist}
+                      </p>
                     </>
                   ) : (
                     <p className="text-gray-400">Select a song to play</p>
@@ -226,52 +243,78 @@ export const TopBar: React.FC<TopBarProps> = ({
                 </div>
 
                 <div className="flex justify-center items-center space-x-4 my-4">
-                  <button onClick={prevSong} className="text-gray-300 hover:text-white">
+                  <button
+                    onClick={prevSong}
+                    className="text-gray-300 hover:text-white"
+                  >
                     <SkipBack className="w-5 h-5" />
                   </button>
                   <button
                     onClick={togglePlay}
                     className="bg-blue-600 hover:bg-blue-700 rounded-full p-2"
                   >
-                    {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                    {isPlaying ? (
+                      <Pause className="w-5 h-5" />
+                    ) : (
+                      <Play className="w-5 h-5" />
+                    )}
                   </button>
-                  <button onClick={nextSong} className="text-gray-300 hover:text-white">
+                  <button
+                    onClick={nextSong}
+                    className="text-gray-300 hover:text-white"
+                  >
                     <SkipForward className="w-5 h-5" />
                   </button>
                 </div>
 
                 <div className="flex items-center space-x-2">
-                  <button onClick={toggleMute} className="text-gray-300 hover:text-white">
-                    {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                  <button
+                    onClick={toggleMute}
+                    className="text-gray-300 hover:text-white"
+                  >
+                    {isMuted ? (
+                      <VolumeX className="w-4 h-4" />
+                    ) : (
+                      <Volume2 className="w-4 h-4" />
+                    )}
                   </button>
                   <input
                     type="range"
                     min="0"
                     max="100"
                     value={volume}
-                    onChange={(e) => changeVolume(parseInt(e.target.value, 10))}
+                    onChange={(e) =>
+                      changeVolume(Number.parseInt(e.target.value, 10))
+                    }
                     className="w-full h-1.5 rounded-lg appearance-none bg-[#333] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-500"
                   />
                 </div>
               </div>
 
               <div className="max-h-40 overflow-y-auto">
-                <h4 className="text-gray-400 text-xs uppercase font-semibold mb-2">Library</h4>
+                <h4 className="text-gray-400 text-xs uppercase font-semibold mb-2">
+                  Library
+                </h4>
                 <ul className="space-y-1">
                   {DEMO_SONGS.map((song) => (
                     <li key={song.id}>
                       <button
                         onClick={() => playSong(song)}
-                        className={`w-full text-left p-2 rounded-md text-sm hover:bg-[#303030] ${currentSong?.id === song.id ? "bg-[#303030] text-blue-400" : "text-gray-300"
-                          }`}
+                        className={`w-full text-left p-2 rounded-md text-sm hover:bg-[#303030] ${
+                          currentSong?.id === song.id
+                            ? "bg-[#303030] text-blue-400"
+                            : "text-gray-300"
+                        }`}
                       >
                         <div className="flex items-center">
                           <div className="flex-grow">
                             <p className="font-medium truncate">{song.name}</p>
-                            <p className="text-xs text-gray-400 truncate">{song.artist}</p>
+                            <p className="text-xs text-gray-400 truncate">
+                              {song.artist}
+                            </p>
                           </div>
                           {currentSong?.id === song.id && isPlaying && (
-                            <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                            <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
                           )}
                         </div>
                       </button>

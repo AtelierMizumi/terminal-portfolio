@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import { useWobbleEffect } from "./window-wobble-provider";
 import { animate } from "animejs";
-import { format } from 'date-fns';
+import { format } from "date-fns";
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
+import { useWobbleEffect } from "./window-wobble-provider";
 
 interface WindowProps {
   id: string;
@@ -80,8 +81,10 @@ export const Window: React.FC<WindowProps> = ({
       const distY = (e.clientY - centerY) / (window.innerHeight / 2);
 
       // Calculate wobble effect (stronger when closer to the window)
-      const distance = Math.sqrt(Math.pow(e.clientX - centerX, 2) + Math.pow(e.clientY - centerY, 2));
-      const windowSize = Math.sqrt(Math.pow(rect.width, 2) + Math.pow(rect.height, 2));
+      const distance = Math.sqrt(
+        (e.clientX - centerX) ** 2 + (e.clientY - centerY) ** 2,
+      );
+      const windowSize = Math.sqrt(rect.width ** 2 + rect.height ** 2);
       const maxDist = windowSize * 1.5;
       const factor = Math.max(0, 1 - distance / maxDist);
 
@@ -112,12 +115,12 @@ export const Window: React.FC<WindowProps> = ({
       const updateDate = () => {
         const now = new Date();
         const options: Intl.DateTimeFormatOptions = {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
         };
-        setCurrentDate(now.toLocaleDateString('en-US', options));
+        setCurrentDate(now.toLocaleDateString("en-US", options));
       };
 
       updateDate();
@@ -182,9 +185,9 @@ export const Window: React.FC<WindowProps> = ({
   const handleMouseUp = () => {
     // If we were resizing, dispatch a custom event to notify terminals
     if (isResizing) {
-      const resizeEndEvent = new CustomEvent('terminal-resize-end', {
+      const resizeEndEvent = new CustomEvent("terminal-resize-end", {
         bubbles: true,
-        detail: { id }
+        detail: { id },
       });
       windowRef.current?.dispatchEvent(resizeEndEvent);
 
@@ -240,14 +243,15 @@ export const Window: React.FC<WindowProps> = ({
         opacity: [0, 1],
         scale: [0.9, 1],
         duration: 300,
-        easing: 'easeOutQuad'
+        easing: "easeOutQuad",
       });
 
       // Adjust position if window would overlap with topbar
-      if (position.y < 48) { // 48px accounts for topbar height + some padding
+      if (position.y < 48) {
+        // 48px accounts for topbar height + some padding
         setPosition({
           ...position,
-          y: Math.max(48, position.y)
+          y: Math.max(48, position.y),
         });
       }
     }
@@ -262,7 +266,7 @@ export const Window: React.FC<WindowProps> = ({
         left: position.x,
         top: position.y,
         duration: 300,
-        easing: 'easeOutQuad'
+        easing: "easeOutQuad",
       });
     }
   }, [size.width, size.height, position.x, position.y]);
@@ -285,9 +289,10 @@ export const Window: React.FC<WindowProps> = ({
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
         border: "1px solid rgba(255, 255, 255, 0.1)",
-        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
+        boxShadow:
+          "0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
       }}
-      onMouseDown={() => onFocus && onFocus()}
+      onMouseDown={() => onFocus?.()}
     >
       {/* macOS style titlebar */}
       <div
@@ -312,8 +317,8 @@ export const Window: React.FC<WindowProps> = ({
                     opacity: [1, 0],
                     scale: [1, 0.9],
                     duration: 200,
-                    easing: 'easeOutQuad',
-                    complete: onClose
+                    easing: "easeOutQuad",
+                    complete: onClose,
                   });
                 } else {
                   onClose();
@@ -321,7 +326,9 @@ export const Window: React.FC<WindowProps> = ({
               }}
               title="Close"
             >
-              <span className="icon opacity-0 group-hover:opacity-100 text-black text-[8px]">×</span>
+              <span className="icon opacity-0 group-hover:opacity-100 text-black text-[8px]">
+                ×
+              </span>
             </div>
           )}
 
@@ -336,13 +343,15 @@ export const Window: React.FC<WindowProps> = ({
                     translateY: [0, 20],
                     opacity: [1, 0],
                     duration: 300,
-                    easing: 'easeOutQuad'
+                    easing: "easeOutQuad",
                   });
                 }
               }}
               title="Minimize"
             >
-              <span className="icon opacity-0 group-hover:opacity-100 text-black text-[8px]">-</span>
+              <span className="icon opacity-0 group-hover:opacity-100 text-black text-[8px]">
+                -
+              </span>
             </div>
           )}
 
@@ -355,7 +364,9 @@ export const Window: React.FC<WindowProps> = ({
               }}
               title={maximized ? "Restore" : "Maximize"}
             >
-              <span className="icon opacity-0 group-hover:opacity-100 text-black text-[8px]">□</span>
+              <span className="icon opacity-0 group-hover:opacity-100 text-black text-[8px]">
+                □
+              </span>
             </div>
           )}
         </div>
@@ -369,7 +380,7 @@ export const Window: React.FC<WindowProps> = ({
         </div>
 
         {/* Spacer for right side */}
-        <div className="w-14"></div>
+        <div className="w-14" />
       </div>
 
       <div
@@ -379,7 +390,7 @@ export const Window: React.FC<WindowProps> = ({
           height: "calc(100% - 32px)",
           borderBottomLeftRadius: "0.75rem",
           borderBottomRightRadius: "0.75rem",
-          overflow: "hidden" // Ensure content doesn't overflow
+          overflow: "hidden", // Ensure content doesn't overflow
         }}
       >
         {children}
@@ -391,7 +402,8 @@ export const Window: React.FC<WindowProps> = ({
           className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize"
           onMouseDown={(e) => handleMouseDown(e, "resize")}
           style={{
-            backgroundImage: 'linear-gradient(135deg, transparent 50%, rgba(255, 255, 255, 0.3) 50%)',
+            backgroundImage:
+              "linear-gradient(135deg, transparent 50%, rgba(255, 255, 255, 0.3) 50%)",
           }}
         />
       )}
@@ -399,6 +411,8 @@ export const Window: React.FC<WindowProps> = ({
   );
 };
 
-export const WindowManager: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const WindowManager: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   return <div className="window-manager">{children}</div>;
 };

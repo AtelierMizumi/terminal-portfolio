@@ -1,12 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
 import { animate } from "animejs";
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface TaskBarProps {
   onArchClick: () => void;
   extraButtons?: React.ReactNode;
 }
 
-export const TaskBar: React.FC<TaskBarProps> = ({ onArchClick, extraButtons }) => {
+export const TaskBar: React.FC<TaskBarProps> = ({
+  onArchClick,
+  extraButtons,
+}) => {
   const [currentTime, setCurrentTime] = useState<string>("");
   const taskbarRef = useRef<HTMLDivElement>(null);
 
@@ -15,13 +19,13 @@ export const TaskBar: React.FC<TaskBarProps> = ({ onArchClick, extraButtons }) =
     const updateTime = () => {
       const now = new Date();
       setCurrentTime(
-        now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       );
     };
-    
+
     updateTime();
     const timer = setInterval(updateTime, 1000);
-    
+
     return () => clearInterval(timer);
   }, []);
 
@@ -32,54 +36,54 @@ export const TaskBar: React.FC<TaskBarProps> = ({ onArchClick, extraButtons }) =
         translateY: [50, 0],
         opacity: [0, 1],
         duration: 800,
-        easing: 'easeOutQuad',
-        delay: 300
+        easing: "easeOutQuad",
+        delay: 300,
       });
     }
   }, []);
 
   // Function to play click sound
   const playClickSound = () => {
-    const audio = new Audio('/sounds/click.mp3');
+    const audio = new Audio("/sounds/click.mp3");
     audio.volume = 0.3;
-    audio.play().catch(err => console.error('Error playing sound:', err));
+    audio.play().catch((err) => console.error("Error playing sound:", err));
   };
 
   return (
-    <div 
+    <div
       ref={taskbarRef}
       className="taskbar w-full h-12 fixed bottom-0 flex items-center justify-between px-4 z-50"
     >
       <div className="left flex items-center gap-4">
-        <button 
+        <button
           className="arch-icon w-8 h-8 rounded-full overflow-hidden hover:scale-110 transition"
           onClick={() => {
             playClickSound();
             onArchClick();
           }}
         >
-          <img 
-            src="/arch.svg" 
-            alt="Arch" 
+          <img
+            src="/arch.svg"
+            alt="Arch"
             className="w-full h-full object-contain filter brightness-110"
           />
         </button>
-        
-        <button 
+
+        <button
           className="taskbar-button"
           onClick={(e) => {
             playClickSound();
             animate(e.currentTarget, {
               scale: [1, 1.2, 1],
               duration: 300,
-              easing: 'easeInOutQuad'
+              easing: "easeInOutQuad",
             });
           }}
         >
-          <svg 
-            width="18" 
-            height="18" 
-            viewBox="0 0 24 24" 
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             className="text-white"
@@ -95,18 +99,16 @@ export const TaskBar: React.FC<TaskBarProps> = ({ onArchClick, extraButtons }) =
         </button>
       </div>
 
-      <div className="center flex items-center gap-2">
-        {extraButtons}
-      </div>
+      <div className="center flex items-center gap-2">{extraButtons}</div>
 
-      <div 
+      <div
         className="time text-text text-sm"
         onClick={(e) => {
           playClickSound();
           animate(e.currentTarget, {
             scale: [1, 1.1, 1],
             duration: 300,
-            easing: 'easeInOutQuad'
+            easing: "easeInOutQuad",
           });
         }}
       >

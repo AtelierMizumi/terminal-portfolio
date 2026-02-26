@@ -1,8 +1,17 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Terminal, Gamepad, Music, Info, FileText, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  FileText,
+  FolderOpen,
+  Gamepad,
+  Info,
+  Music,
+  Terminal,
+  X,
+} from "lucide-react";
+import type React from "react";
+import { useEffect, useRef } from "react";
 
 interface ArchMenuProps {
   isOpen: boolean;
@@ -12,6 +21,7 @@ interface ArchMenuProps {
   onGameMenuOpen: () => void;
   onAboutOpen?: () => void;
   onResumeOpen?: () => void;
+  onFilesOpen?: () => void;
 }
 
 export const ArchMenu: React.FC<ArchMenuProps> = ({
@@ -22,13 +32,18 @@ export const ArchMenu: React.FC<ArchMenuProps> = ({
   onGameMenuOpen,
   onAboutOpen,
   onResumeOpen,
+  onFilesOpen,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node) && isOpen) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        isOpen
+      ) {
         onClose();
       }
     };
@@ -74,7 +89,9 @@ export const ArchMenu: React.FC<ArchMenuProps> = ({
                 </div>
                 <div>
                   <div className="text-gray-300 font-medium">Terminal</div>
-                  <div className="text-gray-500 text-xs">Command line interface</div>
+                  <div className="text-gray-500 text-xs">
+                    Command line interface
+                  </div>
                 </div>
               </button>
 
@@ -107,7 +124,9 @@ export const ArchMenu: React.FC<ArchMenuProps> = ({
                 </div>
                 <div>
                   <div className="text-gray-300 font-medium">Arcade Games</div>
-                  <div className="text-gray-500 text-xs">Play browser games</div>
+                  <div className="text-gray-500 text-xs">
+                    Play browser games
+                  </div>
                 </div>
               </button>
 
@@ -144,6 +163,26 @@ export const ArchMenu: React.FC<ArchMenuProps> = ({
                 <div>
                   <div className="text-gray-300 font-medium">Resume</div>
                   <div className="text-gray-500 text-xs">View my resume</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  if (onFilesOpen) {
+                    onFilesOpen();
+                    onClose();
+                  }
+                }}
+                className="flex items-center p-2 rounded-md text-left hover:bg-[#313244] active:scale-[0.98] transition-all group"
+              >
+                <div className="w-8 h-8 bg-[#313244] group-hover:bg-[#45475a] rounded-full flex items-center justify-center mr-2">
+                  <FolderOpen className="w-4 h-4 text-orange-400" />
+                </div>
+                <div>
+                  <div className="text-gray-300 font-medium">Files</div>
+                  <div className="text-gray-500 text-xs">
+                    Browse files and folders
+                  </div>
                 </div>
               </button>
             </div>

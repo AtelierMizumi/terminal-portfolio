@@ -1,7 +1,7 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from 'react';
-import { animate } from 'animejs';
+import { animate } from "animejs";
+import { type ReactNode, createContext, useContext, useState } from "react";
 
 interface WobbleContextType {
   wobbleEnabled: boolean;
@@ -23,15 +23,15 @@ export const WobbleProvider: React.FC<WobbleProviderProps> = ({ children }) => {
   const [wobbleEnabled, setWobbleEnabled] = useState(true);
 
   const toggleWobble = () => {
-    setWobbleEnabled(prev => !prev);
-    
+    setWobbleEnabled((prev) => !prev);
+
     // Animate the toggle button when clicked
-    const toggleButton = document.querySelector('.wobble-toggle');
+    const toggleButton = document.querySelector(".wobble-toggle");
     if (toggleButton) {
       animate(toggleButton, {
         scale: [1, 1.2, 1],
         duration: 300,
-        easing: 'easeInOutQuad'
+        easing: "easeInOutQuad",
       });
     }
   };

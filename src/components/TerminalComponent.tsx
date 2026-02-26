@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef } from 'react';
-import '@xterm/xterm/css/xterm.css';
-import { createTerminal } from '@/utils/terminal';
+import type React from "react";
+import { useEffect, useRef } from "react";
+import "@xterm/xterm/css/xterm.css";
+import { createTerminal } from "@/utils/terminal";
 
 interface TerminalComponentProps {
   initialCommand?: string;
@@ -10,11 +11,13 @@ interface TerminalComponentProps {
 }
 
 const TerminalComponent: React.FC<TerminalComponentProps> = ({
-  initialCommand = '',
-  className = '',
+  initialCommand = "",
+  className = "",
 }) => {
   const terminalRef = useRef<HTMLDivElement>(null);
-  const termInstanceRef = useRef<ReturnType<typeof createTerminal> | null>(null);
+  const termInstanceRef = useRef<ReturnType<typeof createTerminal> | null>(
+    null,
+  );
   const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize terminal on mount
@@ -30,7 +33,7 @@ const TerminalComponent: React.FC<TerminalComponentProps> = ({
           initialCommand,
         });
       } catch (err) {
-        console.error('Failed to initialize terminal:', err);
+        console.error("Failed to initialize terminal:", err);
       }
     }, 50);
 
@@ -62,11 +65,11 @@ const TerminalComponent: React.FC<TerminalComponentProps> = ({
       // Debounce the resize operation
       resizeTimeoutRef.current = setTimeout(() => {
         try {
-          if (termInstanceRef.current && termInstanceRef.current.handleResize) {
+          if (termInstanceRef.current?.handleResize) {
             termInstanceRef.current.handleResize();
           }
         } catch (err) {
-          console.error('Error resizing terminal:', err);
+          console.error("Error resizing terminal:", err);
         }
       }, 100); // 100ms debounce
     });

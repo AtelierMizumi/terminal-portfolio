@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Window } from "./WindowManager";
 import { animate } from "animejs";
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
+import { Window } from "./WindowManager";
 
 interface GameItem {
   id: string;
@@ -23,43 +24,43 @@ const GAMES_LIST: GameItem[] = [
     name: "Flappy Bird",
     icon: "🐦",
     description: "Classic flappy bird game. Tap to fly through pipes!",
-    launchCommand: "launch-flappy"
+    launchCommand: "launch-flappy",
   },
   {
     id: "mario",
     name: "Super Mario",
     icon: "🍄",
     description: "The classic platformer game, Mario!",
-    launchCommand: "launch-mario"
+    launchCommand: "launch-mario",
   },
   {
     id: "tetris",
     name: "Tetris",
     icon: "🧱",
     description: "Arrange falling blocks to create complete lines.",
-    launchCommand: "launch-tetris"
+    launchCommand: "launch-tetris",
   },
   {
     id: "snake",
     name: "Snake",
     icon: "🐍",
     description: "Eat food and grow longer without hitting yourself.",
-    launchCommand: "launch-snake"
+    launchCommand: "launch-snake",
   },
   {
     id: "chess",
     name: "Chess",
     icon: "♟️",
     description: "The classic strategy board game.",
-    launchCommand: "launch-chess"
-  }
+    launchCommand: "launch-chess",
+  },
 ];
 
 export const GamesExplorer: React.FC<GamesExplorerProps> = ({
   isOpen,
   zIndex,
   onClose,
-  onGameLaunch
+  onGameLaunch,
 }) => {
   const [selectedGame, setSelectedGame] = useState<GameItem | null>(null);
   const explorerRef = useRef<HTMLDivElement>(null);
@@ -93,7 +94,7 @@ export const GamesExplorer: React.FC<GamesExplorerProps> = ({
         translateY: [-20, 0],
         opacity: [0, 1],
         duration: 300,
-        easing: 'easeOutQuad'
+        easing: "easeOutQuad",
       });
     }
   }, [isOpen]);
@@ -115,8 +116,8 @@ export const GamesExplorer: React.FC<GamesExplorerProps> = ({
             opacity: [1, 0],
             translateY: [0, -20],
             duration: 200,
-            easing: 'easeOutQuad',
-            complete: onClose
+            easing: "easeOutQuad",
+            complete: onClose,
           });
         } else {
           onClose();
@@ -144,8 +145,8 @@ export const GamesExplorer: React.FC<GamesExplorerProps> = ({
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-text font-medium">Games Library</h2>
             <div className="relative">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder="Search games..."
                 className="bg-gray-700/50 text-text border border-gray-600 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
@@ -154,13 +155,13 @@ export const GamesExplorer: React.FC<GamesExplorerProps> = ({
           </div>
 
           <div className="grid grid-cols-3 gap-3">
-            {GAMES_LIST.map(game => (
-              <div 
+            {GAMES_LIST.map((game) => (
+              <div
                 key={game.id}
                 className={`game-item p-3 rounded-md border cursor-pointer transition-all duration-200 ${
-                  selectedGame?.id === game.id 
-                    ? 'border-blue-500 bg-gray-700/70' 
-                    : 'border-gray-700 hover:border-gray-500 hover:bg-gray-700/30'
+                  selectedGame?.id === game.id
+                    ? "border-blue-500 bg-gray-700/70"
+                    : "border-gray-700 hover:border-gray-500 hover:bg-gray-700/30"
                 }`}
                 onClick={() => handleGameClick(game)}
                 onDoubleClick={() => handleGameDoubleClick(game)}
@@ -168,14 +169,14 @@ export const GamesExplorer: React.FC<GamesExplorerProps> = ({
                   animate(e.currentTarget, {
                     scale: 1.05,
                     duration: 200,
-                    easing: 'easeOutQuad'
+                    easing: "easeOutQuad",
                   });
                 }}
                 onMouseLeave={(e) => {
                   animate(e.currentTarget, {
                     scale: 1,
                     duration: 200,
-                    easing: 'easeOutQuad'
+                    easing: "easeOutQuad",
                   });
                 }}
               >
@@ -183,7 +184,9 @@ export const GamesExplorer: React.FC<GamesExplorerProps> = ({
                   <div className="game-icon text-3xl mr-3">{game.icon}</div>
                   <div className="flex-1">
                     <h3 className="text-text font-medium">{game.name}</h3>
-                    <p className="text-text/70 text-sm mt-1 line-clamp-2">{game.description}</p>
+                    <p className="text-text/70 text-sm mt-1 line-clamp-2">
+                      {game.description}
+                    </p>
                   </div>
                 </div>
               </div>
