@@ -82,6 +82,7 @@ export const createTerminal = ({
 
     try {
       // Make sure the renderer is initialized before attempting to fit
+      // biome-ignore lint/suspicious/noExplicitAny: Accessing internal property for fit addon check
       if ((terminal as any)._core?._renderService) {
         fitAddon.fit();
       }

@@ -191,9 +191,9 @@ const ResumeViewer: React.FC<ResumeViewerProps> = ({ className = "" }) => {
                 </span>
               </div>
               <ul className="mt-1 space-y-0.5">
-                {project.details.map((detail, i) => (
+                {project.details.map((detail) => (
                   <li
-                    key={i}
+                    key={detail}
                     className="text-xs text-gray-400 flex items-start gap-1.5"
                   >
                     <span className="text-gray-600 mt-1">•</span>

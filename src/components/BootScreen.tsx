@@ -44,6 +44,7 @@ const BootScreen: React.FC<BootScreenProps> = ({ onComplete }) => {
     "Starting User Session...",
   ];
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Only run on mount or specific conditions
   useEffect(() => {
     // Check if we've already booted this session
     if (
@@ -104,9 +105,9 @@ const BootScreen: React.FC<BootScreenProps> = ({ onComplete }) => {
 
         {/* Text lines container */}
         <div className={`relative z-10 ${isGlitching ? "animate-pulse" : ""}`}>
-          {lines.map((line, index) => (
+          {lines.map((line) => (
             <div
-              key={index}
+              key={line}
               className="leading-relaxed drop-shadow-[0_0_2px_rgba(0,255,0,0.8)]"
             >
               {line || " "}

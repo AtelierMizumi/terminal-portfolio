@@ -105,6 +105,7 @@ export const AudioVisualizerProvider: React.FC<{ children: ReactNode }> = ({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Initialize audio element once on mount
   useEffect(() => {
     // Initialize single audio element
     const audio = new Audio();
@@ -154,6 +155,7 @@ export const AudioVisualizerProvider: React.FC<{ children: ReactNode }> = ({
     try {
       if (!audioRef.current) return;
       const AudioContextCtor =
+        // biome-ignore lint/suspicious/noExplicitAny: Browser compatibility fallback
         window.AudioContext || (window as any).webkitAudioContext;
       if (!AudioContextCtor) return;
 

@@ -48,7 +48,7 @@ export const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
         // Only use the lower half of frequencies (where most music energy is)
         const usefulBins = Math.floor(bufferLength * 0.5);
         const barWidth = (width / usefulBins) * 2;
-        let barHeight;
+        let barHeight: number;
         let x = 0;
 
         for (let i = 0; i < usefulBins; i++) {

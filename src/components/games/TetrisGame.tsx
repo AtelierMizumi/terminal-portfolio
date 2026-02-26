@@ -171,6 +171,7 @@ const TetrisGame: React.FC<TetrisGameProps> = ({ className = "" }) => {
     return ghost.y;
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Helper functions do not need to be in deps
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -204,7 +205,7 @@ const TetrisGame: React.FC<TetrisGameProps> = ({ className = "" }) => {
     for (let r = 0; r < BOARD_HEIGHT; r++) {
       for (let c = 0; c < BOARD_WIDTH; c++) {
         if (board[r][c]) {
-          drawCell(ctx, c, r, board[r][c]!);
+          drawCell(ctx, c, r, board[r][c] || "");
         }
       }
     }
@@ -286,6 +287,7 @@ const TetrisGame: React.FC<TetrisGameProps> = ({ className = "" }) => {
     ctx.shadowBlur = 0;
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Helper functions do not need to be in deps
   const gameStep = useCallback(() => {
     const board = boardRef.current;
     let piece = currentPieceRef.current;
@@ -342,7 +344,7 @@ const TetrisGame: React.FC<TetrisGameProps> = ({ className = "" }) => {
     };
   }, [gameState, gameStep]);
 
-  // Keyboard
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Helper functions do not need to be in deps
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (gameState !== "playing") return;

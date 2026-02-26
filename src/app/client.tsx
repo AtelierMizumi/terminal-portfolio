@@ -105,6 +105,7 @@ export const Client: React.FC = () => {
   const [mounted, setMounted] = useState(false);
 
   const clientRef = useRef<HTMLDivElement>(null);
+  // biome-ignore lint/suspicious/noExplicitAny: Required for animation scope type compatibility
   const animationScope = useRef<any>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const backgroundRef = useRef<HTMLDivElement>(null);
@@ -317,6 +318,7 @@ export const Client: React.FC = () => {
 
   // Handle game launch
   const handleGameLaunch = useCallback(
+    // biome-ignore lint/suspicious/noExplicitAny: Required for GameItem component type compatibility
     (game: any) => {
       const newZIndex = maxZIndex + 1;
       const newId = `game-${Date.now()}`;

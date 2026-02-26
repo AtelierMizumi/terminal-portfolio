@@ -37,9 +37,9 @@ export const useTerminalSounds = ({
       };
 
       // Set volume for all sounds
-      Object.values(audioCache.current).forEach((audio) => {
+      for (const audio of Object.values(audioCache.current)) {
         if (audio) {
-          audio.volume = volume; // Configurable volume
+          audio.volume = volume / 100; // Configurable volume
 
           // Add event listeners to track loading
           audio.addEventListener("canplaythrough", () => {
@@ -49,24 +49,25 @@ export const useTerminalSounds = ({
           // Preload audio
           audio.load();
         }
-      });
+      }
     } catch (error) {
       console.error("Error initializing audio:", error);
     }
 
     // Cleanup
     return () => {
-      Object.values(audioCache.current).forEach((audio) => {
+      for (const audio of Object.values(audioCache.current)) {
         if (audio) {
           try {
             audio.pause();
+            audio.src = ""; // Clear source to release resources
             audio.currentTime = 0;
             audio.removeEventListener("canplaythrough", () => setIsReady(true));
           } catch (err) {
             console.debug("Error cleaning up audio:", err);
           }
         }
-      });
+      }
     };
   }, [enabled, volume]);
 

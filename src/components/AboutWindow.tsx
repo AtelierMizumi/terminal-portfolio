@@ -106,9 +106,9 @@ const AboutWindow: React.FC<AboutWindowProps> = ({ className = "" }) => {
             { icon: "🏔️", label: "Linux / NixOS", color: "text-blue-400" },
             { icon: "🎮", label: "MiSide / Genshin", color: "text-purple-400" },
             { icon: "🎵", label: "Lofi & Ambient", color: "text-pink-400" },
-          ].map((item, i) => (
+          ].map((item) => (
             <div
-              key={i}
+              key={item.label}
               className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.03] hover:bg-white/[0.06] transition-colors"
             >
               <span className={item.color}>

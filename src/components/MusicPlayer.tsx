@@ -12,6 +12,7 @@ import {
   SkipForward,
   Volume2,
   VolumeX,
+  Music,
 } from "lucide-react";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";

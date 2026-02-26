@@ -15,7 +15,10 @@ interface TerminalProps {
 
 const Terminal: React.FC<TerminalProps> = ({ className = "" }) => {
   const terminalRef = useRef<HTMLDivElement>(null);
-  const terminalInstanceRef = useRef<any>(null);
+  const terminalInstanceRef = useRef<{
+    terminal: XTerminal;
+    dispose: () => void;
+  } | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
   const [terminalReady, setTerminalReady] = useState(false);
   const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -310,9 +313,10 @@ const Terminal: React.FC<TerminalProps> = ({ className = "" }) => {
     } else if (cmd in commands) {
       try {
         await commands[cmd](terminal, args);
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : String(err);
         terminal.writeln(
-          `\r\n\x1b[1;31mError: ${err.message || "Unknown error during execution"}\x1b[0m`,
+          `\r\n\x1b[1;31mError: ${errorMessage || "Unknown error during execution"}\x1b[0m`,
         );
         console.error("Command error:", err);
       }
@@ -393,16 +397,16 @@ const Terminal: React.FC<TerminalProps> = ({ className = "" }) => {
       ".absolute.bottom-0.right-0.w-4.h-4.cursor-se-resize",
     );
 
-    resizeHandles.forEach((handle) => {
+    for (const handle of resizeHandles) {
       handle.addEventListener("mousedown", handleMouseDown);
-    });
+    }
 
     document.addEventListener("mouseup", handleMouseUp);
 
     return () => {
-      resizeHandles.forEach((handle) => {
+      for (const handle of resizeHandles) {
         handle.removeEventListener("mousedown", handleMouseDown);
-      });
+      }
       document.removeEventListener("mouseup", handleMouseUp);
     };
   }, []);

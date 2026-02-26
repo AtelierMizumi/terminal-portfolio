@@ -18,6 +18,7 @@ interface FileManagerProps {
 }
 
 // Mock Data Structure
+// biome-ignore lint/suspicious/noExplicitAny: Required for mock data flexibility
 const FILE_SYSTEM: Record<string, any> = {
   "~": {
     name: "Home",
@@ -145,17 +146,73 @@ const FILE_SYSTEM: Record<string, any> = {
     type: "folder",
     children: [
       {
-        id: "p-1",
-        name: "Terminal Portfolio",
+        id: "p-github-profile",
+        name: "@AtelierMizumi",
+        type: "link",
+        url: "https://github.com/AtelierMizumi",
+        icon: <ExternalLink className="w-10 h-10 text-purple-400" />,
+      },
+      {
+        id: "p-terminal-portfolio",
+        name: "terminal-portfolio",
         type: "link",
         url: "https://github.com/AtelierMizumi/terminal-portfolio",
         icon: <Folder className="w-10 h-10 text-cyan-400" />,
       },
       {
-        id: "p-2",
-        name: "ZMK Firmware",
+        id: "p-nixos-kde-config",
+        name: "nixos-kde-config",
         type: "link",
-        url: "https://github.com/AtelierMizumi/zmk-firmware",
+        url: "https://github.com/AtelierMizumi/nixos-kde-config",
+        icon: <Folder className="w-10 h-10 text-cyan-400" />,
+      },
+      {
+        id: "p-anime-cli",
+        name: "anime-cli",
+        type: "link",
+        url: "https://github.com/AtelierMizumi/anime-cli",
+        icon: <Folder className="w-10 h-10 text-cyan-400" />,
+      },
+      {
+        id: "p-ai-labs",
+        name: "AI-Labs",
+        type: "link",
+        url: "https://github.com/AtelierMizumi/AI-Labs",
+        icon: <Folder className="w-10 h-10 text-cyan-400" />,
+      },
+      {
+        id: "p-nix-lms-answer-checker",
+        name: "nix-lms-answer-checker",
+        type: "link",
+        url: "https://github.com/AtelierMizumi/nix-lms-answer-checker",
+        icon: <Folder className="w-10 h-10 text-cyan-400" />,
+      },
+      {
+        id: "p-ateliermc",
+        name: "AtelierMC",
+        type: "link",
+        url: "https://github.com/AtelierMizumi/AtelierMC",
+        icon: <Folder className="w-10 h-10 text-cyan-400" />,
+      },
+      {
+        id: "p-c-exercise",
+        name: "C---Exercise",
+        type: "link",
+        url: "https://github.com/AtelierMizumi/C---Exercise",
+        icon: <Folder className="w-10 h-10 text-cyan-400" />,
+      },
+      {
+        id: "p-java",
+        name: "JavaExerciseProductManager",
+        type: "link",
+        url: "https://github.com/AtelierMizumi/JavaExerciseProductManager",
+        icon: <Folder className="w-10 h-10 text-cyan-400" />,
+      },
+      {
+        id: "p-cs2",
+        name: "cs2-movement-config",
+        type: "link",
+        url: "https://github.com/AtelierMizumi/cs2-movement-config",
         icon: <Folder className="w-10 h-10 text-cyan-400" />,
       },
     ],
@@ -192,6 +249,7 @@ const FileManager: React.FC<FileManagerProps> = ({ className = "" }) => {
 
   const currentFolder = FILE_SYSTEM[currentPath];
 
+  // biome-ignore lint/suspicious/noExplicitAny: Required for generic item handling
   const handleItemClick = (item: any) => {
     if (item.type === "folder") {
       navigateTo(item.id);
@@ -297,6 +355,7 @@ const FileManager: React.FC<FileManagerProps> = ({ className = "" }) => {
         <div className="flex-1 overflow-y-auto p-4">
           {currentFolder?.view === "gallery" ? (
             <div className="grid grid-cols-2 gap-4">
+              {/* biome-ignore lint/suspicious/noExplicitAny: Generic item */}
               {currentFolder.children.map((item: any) => (
                 <button
                   key={item.id}
@@ -319,6 +378,7 @@ const FileManager: React.FC<FileManagerProps> = ({ className = "" }) => {
             </div>
           ) : currentFolder?.view === "list" ? (
             <div className="space-y-1">
+              {/* biome-ignore lint/suspicious/noExplicitAny: Generic item */}
               {currentFolder.children.map((item: any) => (
                 <button
                   key={item.id}
@@ -337,6 +397,7 @@ const FileManager: React.FC<FileManagerProps> = ({ className = "" }) => {
             </div>
           ) : (
             <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-4">
+              {/* biome-ignore lint/suspicious/noExplicitAny: Generic item */}
               {currentFolder?.children?.map((item: any) => (
                 <button
                   key={item.id}
